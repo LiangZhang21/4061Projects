@@ -5,12 +5,33 @@
  * The file should be in a corresponding folder in output/IntermediateData/ 
  */
 void writeInterDSToFiles(void) {
+	int i;
+	char buffer[30];
+	char buffer2[30];
+	for(i = 0; i < MaxWordLength; i++){
+		sprintf(buffer, "%d %d", i+1, interDS[i]);			
+		sprintf(buffer2, "/%d/m_%d.txt", i+1, mapperID);
+		char temp[100];
+		strcpy(temp, intermediateDir);
+		strcat(temp, buffer2);
+		writeLineToFile(temp, buffer);
+	}
 }
 
 /**
  * Read lines from files, and count words by word length
  */
 void map(char * inputFileName) {
+	FILE * fp = getFilePointer(inputFileName);
+	char buffer[80];
+	while(getLineFromFile(fp, buffer, 79) > 0){
+		char* token = strtok(buffer,"\n");
+		token = strtok(buffer, " ");
+		while(token != NULL){
+			interDS[strlen(token)-1]++;
+			token = strtok(NULL, " ");
+		}
+	}
 }
 
 int main(int argc, char *argv[]) {

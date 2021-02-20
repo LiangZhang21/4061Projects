@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 	pid_t reducers;
 	for(i=0; i<nMappers; i++){
 		if((mappers = fork()) == 0){
-			sprintf(buffer,"%d",i);
+			sprintf(buffer,"%d", i+1);
 			execl("./mapper", "./mapper", buffer, argv[1], inputFileDir, NULL);
 		}else if(mappers < 0){
 			perror("Failed");
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	// TODO: spawn reducers
 	for(i=0; i<nReducers; i++){
 		if((reducers = fork()) == 0){
-			sprintf(buffer2,"%d",i);
+			sprintf(buffer2,"%d", i+1);
 			execl("./reducer", "./reducer",buffer2, argv[2], inputFileDir,NULL);
 		}else if(reducers < 0){
 			perror("Failed");
