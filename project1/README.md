@@ -1,16 +1,19 @@
 # Project 1 : MapReduce - Word counts of different lengths
 
 ## Master function (mapreduce.c)
-	The master function spawns the same amount of mapper processes according the input amount of nMappers. Each process will call the exec() function and run the mapper.c file. The parent will wait untill the processes return before moving to the next step.  
-	And we repeat the same steps for reduce, where it spawns the same amount of reduce processes according the input amount of nReducers. Each process will call the exec() function and run the ruducer.c. And the parent will wait untill all the processes ended.  
+	The master function spawns the same amount of mapper processes according the input amount of nMappers.  
+Each process will call the exec() function and run the mapper.c file. The parent will wait untill the processes return before moving to the next step.    
+
+And we repeat the same steps for reduce, where it spawns the same amount of reduce processes according the input amount of nReducers.   
+Each process will call the exec() function and run the ruducer.c. And the parent will wait untill all the processes ended.  
 ## Map function (mapper.c)
 The mapper.c file have two functions:  
 	1)The first function map() read the contents of the file, and put the value of the words count into an array where its indices is its words length.  
 	2)The second function writeInterDSToFiles() will create and put the words length and words count  from the array into the text file.
 
 ## Reduce function (reducer.c)
-The reduce.c file have two functions:
-	1)The first function reduce() read the contents from the intermediate data and sum it up to a final array.
+The reduce.c file have two functions:  
+	1)The first function reduce() read the contents from the intermediate data and sum it up to a final array.  
 	2)The second function  writeFinalDSToFiles() will create and put the final words length and words count from the array into the final text file.
 
 ## Compile
