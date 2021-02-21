@@ -5,13 +5,33 @@
  * The file should be in a corresponding folder in output/FinalData/ 
  */
 void writeFinalDSToFiles(void) {
+		int i;
+		char buffer[40];
+		char buffer2[40];
+		for(i = 0; i < MaxWordLength; i++){
+			sprintf(buffer, "%d %d", i+1, finalDS[i]);
+			sprintf(buffer2, "/%d.txt", i+1);
+			char temp[100];
+			strcpy(temp, finalDir);
+			strcat(temp, buffer2);
+			if(finalDS[i] != 0){
+				writeLineToFile(temp, buffer);
+			}
+		}
 }
-
-
 /**
  * Read lines from files, and calculate a total count for a specific word length
  */
 void reduce(char * intermediateFileName) {
+	FILE * fp = getFilePointer(intermediateFileName);
+	char buffer[80];
+	char index[10];
+	while(getLineFromFile(fp, buffer, 79) > 0){
+		char* token = strtok(buffer," ");
+		strcpy(index, token);
+		token = strtok(NULL, " ");
+		finalDS[atoi(index)-1] += atoi(token);
+	}
 }
 
 int main(int argc, char *argv[]) {
