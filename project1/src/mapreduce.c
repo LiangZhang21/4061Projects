@@ -1,46 +1,80 @@
 #include "mapreduce.h"
 
-int main(int argc, char *argv[]) {
-	
-	//TODO: number of argument check
-	if(argc != 4 ){
-		perror("Argument too short");
-	}
-	int nMappers 	= strtol(argv[1], NULL, 10);
-	int nReducers 	= strtol(argv[2], NULL, 10);
+int main(int argc, char *argv[])
+{
 
-    inputFileDir = argv[3];
-    if(!isValidDir(inputFileDir))
-        exit(EXIT_FAILURE);
+	//TODO: number of argument check
+	if (argc != 4)
+	{
+		printf("Argument too short");
+		return 1;
+	}
+	int nMappers = strtol(argv[1], NULL, 10);
+	int nReducers = strtol(argv[2], NULL, 10);
+	if (nMappers < nReducers)
+	{
+		printf("#mappers need to be greater than #reducers");
+		return 1;
+	}
+	else if (nMappers > MaxNumProcesses)
+	{
+		printf("#mappers need to be smaller than or equal to 20");
+		return 1;
+	}
+	else if (nReducers > MaxNumProcesses)
+	{
+		printf("#reducers need to be smaller than or equal to 20");
+		return 1;
+	}
+
+	inputFileDir = argv[3];
+	if (!isValidDir(inputFileDir))
+		exit(EXIT_FAILURE);
 
 	bookeepingCode();
-	
-	// TODO: spawn mappers	
+
+	// TODO: spawn mappers
 	int i;
 	char buffer[20];
 	char buffer2[20];
 	pid_t mappers;
 	pid_t reducers;
-	for(i=0; i<nMappers; i++){
-		if((mappers = fork()) == 0){
-			sprintf(buffer,"%d", i+1);
+	for (i = 0; i < nMappers; i++)
+	{
+		if ((mappers = fork()) == 0)
+		{
+			sprintf(buffer, "%d", i + 1);
 			execl("./mapper", "./mapper", buffer, argv[1], inputFileDir, NULL);
-		}else if(mappers < 0){
-			perror("Failed");
+			printf("Failed to create mappers");
+			return 1;
+		}
+		else if (mappers < 0)
+		{
+			printf("Fork mappers failed");
+			return 1;
 		}
 	}
 	// TODO: wait for all children to complete execution
-	while(wait(NULL) > 0);	
+	while (wait(NULL) > 0)
+		;
 	// TODO: spawn reducers
-	for(i=0; i<nReducers; i++){
-		if((reducers = fork()) == 0){
-			sprintf(buffer2,"%d", i+1);
-			execl("./reducer", "./reducer",buffer2, argv[2], inputFileDir,NULL);
-		}else if(reducers < 0){
-			perror("Failed");
+	for (i = 0; i < nReducers; i++)
+	{
+		if ((reducers = fork()) == 0)
+		{
+			sprintf(buffer2, "%d", i + 1);
+			execl("./reducer", "./reducer", buffer2, argv[2], inputFileDir, NULL);
+			printf("Failed to create reducers");
+			return 1;
+		}
+		else if (reducers < 0)
+		{
+			printf("Fork reducers failed");
+			return 1;
 		}
 	}
 	// TODO: wait for all children to complete execution
-	while(wait(NULL) > 0);
+	while (wait(NULL) > 0)
+		;
 	return EXIT_SUCCESS;
 }
