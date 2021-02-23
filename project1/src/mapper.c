@@ -12,7 +12,7 @@ void writeInterDSToFiles(void)
 	for (i = 0; i < MaxWordLength; i++)
 	{
 		sprintf(buffer, "%d %d", i + 1, interDS[i]);
-		sprintf(buffer2, "/%d/m_%d.txt", i + 1, mapperID);
+		sprintf(buffer2, "/%d/m%d.txt", i + 1, mapperID);
 		char temp[maxFileNameLength];
 		strcpy(temp, intermediateDir);
 		strcat(temp, buffer2);
@@ -30,9 +30,10 @@ void map(char *inputFileName)
 	while (getLineFromFile(fp, buffer, chunkSize) > 0)
 	{
 		char *token = strtok(buffer, "\n");
-		token = strtok(buffer, " ");
+		token = strtok(token, " ");
 		while (token != NULL)
 		{
+			if( strlen(token) == 1){printf("%s\n", token);}
 			interDS[strlen(token) - 1]++;
 			token = strtok(NULL, " ");
 		}
