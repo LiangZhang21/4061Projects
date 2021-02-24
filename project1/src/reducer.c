@@ -10,14 +10,15 @@ void writeFinalDSToFiles(void)
 	char buffer[40];
 	char buffer2[maxFileNameLength];
 	for (i = 0; i < MaxWordLength; i++)
-	{
+	{	//iterating through the array and using buffer to display the lengths and counts.
 		sprintf(buffer, "%d %d", i + 1, finalDS[i]);
+		//using buffer and temp for string append for the directory path and create the text file.
 		sprintf(buffer2, "/%d.txt", i + 1);
 		char temp[maxFileNameLength];
 		strcpy(temp, finalDir);
 		strcat(temp, buffer2);
 		if (finalDS[i] != 0)
-		{
+		{	//outputing the final to the text file.
 			writeLineToFile(temp, buffer);
 		}
 	}
@@ -26,15 +27,17 @@ void writeFinalDSToFiles(void)
  * Read lines from files, and calculate a total count for a specific word length
  */
 void reduce(char *intermediateFileName)
-{
+{	//opening up the file
 	FILE *fp = getFilePointer(intermediateFileName);
 	char buffer[chunkSize];
 	char index[10];
+	//get the line from the file and put it into a buffer, run until the end of file.
 	while (getLineFromFile(fp, buffer, chunkSize) > 0)
-	{
+	{	//using strtok to break the " " in the file.
 		char *token = strtok(buffer, " ");
 		strcpy(index, token);
 		token = strtok(NULL, " ");
+		//summing the counts and put it into the finalDS array.
 		finalDS[atoi(index) - 1] += atoi(token);
 	}
 }

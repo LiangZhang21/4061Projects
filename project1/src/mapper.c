@@ -7,15 +7,17 @@
 void writeInterDSToFiles(void)
 {
 	int i;
-	char buffer[30];
+	char buffer[30]; 
 	char buffer2[maxFileNameLength];
 	for (i = 0; i < MaxWordLength; i++)
-	{
+	{	//using buffer to display the word lengths vs counts
 		sprintf(buffer, "%d %d", i + 1, interDS[i]);
+		//using buffer2 for string append for the directory path and create the text file.
 		sprintf(buffer2, "/%d/m%d.txt", i + 1, mapperID);
 		char temp[maxFileNameLength];
 		strcpy(temp, intermediateDir);
 		strcat(temp, buffer2);
+		//outputing to the text file.
 		writeLineToFile(temp, buffer);
 	}
 }
@@ -24,16 +26,17 @@ void writeInterDSToFiles(void)
  * Read lines from files, and count words by word length
  */
 void map(char *inputFileName)
-{
+{	//opening up the file
 	FILE *fp = getFilePointer(inputFileName);
 	char buffer[chunkSize];
+	//get the line from the file and put it into a buffer, run until the end of file.
 	while (getLineFromFile(fp, buffer, chunkSize) > 0)
-	{
+	{	//using strtok to break each \n and " " in the file.
 		char *token = strtok(buffer, "\n");
 		token = strtok(token, " ");
+		//keep running as long as the line is not empty
 		while (token != NULL)
-		{
-			if( strlen(token) == 1){printf("%s\n", token);}
+		{	//using an array to keep track the words, where the length is its indices and value is the count.	
 			interDS[strlen(token) - 1]++;
 			token = strtok(NULL, " ");
 		}
