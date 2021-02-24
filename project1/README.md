@@ -1,4 +1,16 @@
 # Project 1 : MapReduce - Word counts of different lengths
+## Group Members
+test machine: virtual_box_linux_machine  
+data: 02/21/2021  
+name:ZhaoDong Wang, DeHui Zhang, Liang Zhang  
+x500: wang9436,  zhan6146,  zhan6122  
+ 
+ZhaoDong Wang  
+Debugged, worked on mapreduce and mapper.c  
+DeHui Zhang  
+Wrote comments, debugged, and worked on reduce.c  
+Liang Zhang  
+Wrote readme.md, worked on mapreduce and mapper.c  
 
 ## Master function (mapreduce.c)
 The master function spawns the same amount of mapper processes according the input amount of nMappers.  
@@ -18,6 +30,9 @@ The reduce.c file have two functions:
 ## Compile
 	> make clean
 	> make
+	> make t0
+	> make t1 ... so on  
+	use make to run the file you desire and it will produce the result in the output folder.
 
 ## Execution
 	// always call make clean and make before you start execution
