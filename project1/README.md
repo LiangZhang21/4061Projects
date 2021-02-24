@@ -11,7 +11,14 @@ DeHui Zhang
 Wrote comments, debugged, and worked on reduce.c  
 Liang Zhang  
 Wrote readme.md, worked on mapreduce and mapper.c  
-
+## Purpose
+The purpose of this program is to use a single machine to perform MapReduce programming model by using proccesses.  
+It takes in a list of files and use the following functions: mapreduce.c, mapper.c, reducer.c to construct the output folder.  
+And in the  output, it contains an intermediate folder and a final output folder.  
+The program then sum up all the counts value by each proccesses from the intermediate folder and produce the final result in the final output folder.  
+Text files from the final output folder shows the length of each words and the sum of its counts value. 
+## What it does?
+The following information display more details about what mapreduce.c, mapper.c, reducer.c does.
 ## Master function (mapreduce.c)
 The master function spawns the same amount of mapper processes according the input amount of nMappers.  
 Each process will call the exec() function and run the mapper.c file. The parent will wait untill the processes return before moving to the next step.  
