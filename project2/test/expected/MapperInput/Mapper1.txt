@@ -1,0 +1,2 @@
+test/T0/4.txt
+test/T0/tt/6.txt
