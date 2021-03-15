@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     int tIdx;
     for (tIdx = 0; tIdx < nTasks; tIdx++) {
         printf("reducer[%d] - %s\n", reducerID, myTasks[tIdx]);
+       
         reduce(myTasks[tIdx]);
         free(myTasks[tIdx]);
     }

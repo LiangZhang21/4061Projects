@@ -14,7 +14,7 @@ int getNames(char* path){
 		}
 		
 		while((entry = readdir(dir)) != NULL){
-			if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name,"..")) continue;
+			if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
 			if((entry->d_type == DT_DIR)){
 				char next[strlen(path) + strlen(entry->d_name) + 2];
 				next[0] = '\0';
@@ -23,13 +23,12 @@ int getNames(char* path){
 				strcat(next, entry->d_name);
 				getNames(next);
 			}else {
-				char buf[200];
+				char *buf = malloc(sizeof(char) * 200);
 				buf[0] = '\0';
 				strcat(buf, path);
 				strcat(buf, "/");
 				strcat(buf, entry->d_name);
-				file_names[textfile_counter] = (char *)malloc(sizeof(buf) + strlen(entry->d_name) * sizeof(char)+1);
-				strcpy(file_names[textfile_counter], buf);
+				file_names[textfile_counter] = buf;
 				textfile_counter++;		
 			}
 		}
@@ -47,8 +46,8 @@ int main(int argc, char *argv[]) {
 	int nMappers 	= strtol(argv[1], NULL, 10);
 	int nReducers 	= strtol(argv[2], NULL, 10);
 
-    inputFileDir = argv[3];
-    if(!isValidDir(inputFileDir))
+    	inputFileDir = argv[3];
+    	if(!isValidDir(inputFileDir))
         exit(EXIT_FAILURE);
 
 	bookeepingCode();
@@ -86,23 +85,41 @@ int main(int argc, char *argv[]) {
 		}
 		
 	}
-	
-	
-	//TODO: spawn stream processes
+	//creating a pipe
+	int fd[2];
 
-	// TODO: spawn mappers	
-	/*
-	char buffer[20]; //we need to use this buffer convert the id to string for mappers.
-	char buffer2[20];//we need to use this buffer convert the id to string for reducers.
+	//TODO: spawn stream processes
+	pid_t s_mappers;
 	pid_t mappers; 
-	pid_t reducers;
-	for (i = 0; i < nMappers; i++)
-	{	//spawning mapper proccesses equal to the amount of nMappers.
+	char stream_buf[20];
+	char buffer[20]; //we need to use this buffer convert the id to string for mappers.
+	
+	for(i = 0; i < nMappers; i++){
+		pipe(fd);
+		//spawn stream mappers
+		
+		if((s_mappers = fork()) == 0){		
+			dup2(fd[1], STDOUT_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			sprintf(stream_buf, "%d", i + 1);
+			execl("./stream", "./stream", stream_buf, NULL);
+			printf("Failed to create mappers");
+			return 1;
+		}else if (s_mappers < 0){
+			printf("Fork s_mappers failed");
+			return 1;
+		}
+		//spawn mappers
 		if ((mappers = fork()) == 0) 
-		{	//converting id to string using sprintf and put it in buffer
+		{	
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			//converting id to string using sprintf and put it in buffer
 			sprintf(buffer, "%d", i + 1);
 			//using exec() to run mapper.c with inputs
-			execl("./mapper", "./mapper", buffer, argv[1], inputFileDir, NULL);
+			execl("./mapper", "./mapper", buffer, NULL);
 			printf("Failed to create mappers");
 			return 1;
 		}
@@ -111,18 +128,23 @@ int main(int argc, char *argv[]) {
 			printf("Fork mappers failed");
 			return 1;
 		}
+		close(fd[0]);
+		close(fd[1]);
 	}
-	
+
 	// TODO: wait for all children to complete execution
-	while (wait(NULL) > 0)
+	while (wait(NULL) > 0);
+	
 	// TODO: spawn reducers
+	char buffer2[20];//we need to use this buffer convert the id to string for reducers.
+	pid_t reducers;
 	for (i = 0; i < nReducers; i++)
 	{	//spawning mapper proccesses equal to the amount of nMappers.
 		if ((reducers = fork()) == 0)
 		{	//converting id to string using sprintf and put it in buffer2
 			sprintf(buffer2, "%d", i + 1);
 			//using exec() to run reducer.c with inputs
-			execl("./reducer", "./reducer", buffer2, argv[2], inputFileDir, NULL);
+			execl("./reducer", "./reducer", buffer2, argv[2], NULL);
 			printf("Failed to create reducers");
 			return 1;
 		}
@@ -133,10 +155,9 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	// TODO: wait for all children to complete execution
-	while (wait(NULL) > 0)
-		;
+	while (wait(NULL) > 0);
 	return EXIT_SUCCESS;
-	return EXIT_SUCCESS; */
+	
 }
 
 
