@@ -49,7 +49,7 @@ int getReducerTasks(int nReducers, int reducerID, char *intermediateDir, char **
 			sum++;
 			counter++;
 		}
-		counter = 0;
+		counter = 1;
 	}
 	return sum;
 }
