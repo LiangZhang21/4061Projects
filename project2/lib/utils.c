@@ -50,7 +50,9 @@ int getReducerTasks(int nReducers, int reducerID, char *intermediateDir, char **
 			counter++;
 		}
 		counter = 1;
+		closedir(dir);
 	}
+	
 	return sum;
 }
 

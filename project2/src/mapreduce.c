@@ -29,9 +29,10 @@ int getNames(char* path){
 				strcat(buf, "/");
 				strcat(buf, entry->d_name);
 				file_names[textfile_counter] = buf;
-				textfile_counter++;		
+				textfile_counter++;	
 			}
 		}
+		closedir(dir);
 }	
 
 int main(int argc, char *argv[]) {
@@ -82,9 +83,10 @@ int main(int argc, char *argv[]) {
 			strcpy(sMap_write_buf, file_names[j]);
 			strcat(sMap_write_buf, "\n");
 			write(fd, sMap_write_buf, sizeof(char)*strlen(file_names[j])+1);
+			free(file_names[j]);
 		}
-		
 	}
+	free(file_names);
 	//creating a pipe
 	int fd[2];
 
