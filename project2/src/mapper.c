@@ -9,7 +9,9 @@ void writeInterDSToFiles(void) {
 	char buf[30];
 	char buf2[maxFileNameLength];
 	for(i = 0; i < MaxWordLength; i++){
+		//using buf to display the word length vs counts
 		sprintf(buf, "%d %d", i + 1, interDS[i]);
+		//using buf2 for string append for the path and file.
 		sprintf(buf2, "/%d/m%d.txt", i + 1, mapperID);
 		char temp[maxFileNameLength];
 		strcpy(temp, intermediateDir);
@@ -25,9 +27,10 @@ void parse(char * line) {
 	char buffer[200];
 	buffer[0] = '\0';
 	strcat(buffer, line);
-	char *token = strtok(buffer, "\n");
+	char *token = strtok(buffer, "\n"); //Using token to split the line
 	token = strtok(token, " ");
-	while(token != NULL){
+	while(token != NULL){ 
+	//add the value of the words count into an array where its indices is its length.
 		interDS[strlen(token) - 1]++;
 		token = strtok(NULL, " ");
 	}
@@ -40,6 +43,7 @@ int main(int argc, char *argv[]) {
     // you can read lines from pipes (from STDIN) (read lines in a while loop)
     //feel free to change
     char buf[200];
+    //recevie from the pipe and call the parse() function
     while(read(STDIN_FILENO, buf, 200) > 0) {
         parse(buf);
     }

@@ -4,25 +4,33 @@
 int textfile_counter = 0;
 char** file_names;
 
-int getNames(char* path){
+//This function is used to fill in the file_names array and textfile_counter
+int getNames(char* path)
+{
 		int file_counter;
 		DIR *dir = opendir(path); //open the path directory 
 		struct dirent *entry;
-		if (dir == NULL){ //error check
+		if (dir == NULL)
+		{ //error check
 			printf("Failed to open directory\n");
 			return 1;
 		}
-		
-		while((entry = readdir(dir)) != NULL){
+		//go in to the directory
+		while((entry = readdir(dir)) != NULL)
+		{	//Skipping "." and ".."
 			if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
-			if((entry->d_type == DT_DIR)){
+			if((entry->d_type == DT_DIR))
+			{
 				char next[strlen(path) + strlen(entry->d_name) + 2];
 				next[0] = '\0';
 				strcat(next, path);
 				strcat(next, "/");
 				strcat(next, entry->d_name);
 				getNames(next);
-			}else {
+			}
+			else 
+			{
+				//adding the path into the files_names array and increment the counter
 				char *buf = malloc(sizeof(char) * 200);
 				buf[0] = '\0';
 				strcat(buf, path);
@@ -69,17 +77,21 @@ int main(int argc, char *argv[]) {
 	//open MapperInput folder and create the stream mapper text files.
 	char sMap_buf[20];
 	char sMap_write_buf[200];
-	for(i = 0; i < nMappers; i++){
+	for(i = 0; i < nMappers; i++)
+	{
 		char stream_mapper[200] = "MapperInput/Mapper";
 		sprintf(sMap_buf, "%d.txt", i + 1);
 		strcat(stream_mapper, sMap_buf);
 		int fd = open(stream_mapper, O_WRONLY | O_CREAT, 0777);
-		if(fd == -1){
+		if(fd == -1)
+		{ //Error check
 			printf("Failed to create and open the file. \n");
 			exit(1);
 		}
+		//Distribute the files among the into each stream mappers
 		int j;
-		for(j = i; j < textfile_counter; j+= nMappers){
+		for(j = i; j < textfile_counter; j+= nMappers)
+		{
 			strcpy(sMap_write_buf, file_names[j]);
 			strcat(sMap_write_buf, "\n");
 			write(fd, sMap_write_buf, sizeof(char)*strlen(file_names[j])+1);
@@ -87,28 +99,31 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	free(file_names);
-	//creating a pipe
-	int fd[2];
+	
 
-	//TODO: spawn stream processes
+
+
+	//TODO: spawn stream and mapper processes
 	pid_t s_mappers;
 	pid_t mappers; 
 	char stream_buf[20];
 	char buffer[20]; //we need to use this buffer convert the id to string for mappers.
-	
-	for(i = 0; i < nMappers; i++){
+	int fd[2];	//creating a pipe
+	for(i = 0; i < nMappers; i++)
+	{
 		pipe(fd);
 		//spawn stream mappers
-		
-		if((s_mappers = fork()) == 0){		
+		if((s_mappers = fork()) == 0)
+		{		
 			dup2(fd[1], STDOUT_FILENO);
-			close(fd[0]);
+			close(fd[0]);	//cloesing stdin and stdout
 			close(fd[1]);
 			sprintf(stream_buf, "%d", i + 1);
 			execl("./stream", "./stream", stream_buf, NULL);
 			printf("Failed to create mappers");
 			return 1;
-		}else if (s_mappers < 0){
+		}else if (s_mappers < 0)
+		{
 			printf("Fork s_mappers failed");
 			return 1;
 		}
@@ -116,7 +131,7 @@ int main(int argc, char *argv[]) {
 		if ((mappers = fork()) == 0) 
 		{	
 			dup2(fd[0], STDIN_FILENO);
-			close(fd[0]);
+			close(fd[0]);	//cloesing stdin and stdout
 			close(fd[1]);
 			//converting id to string using sprintf and put it in buffer
 			sprintf(buffer, "%d", i + 1);
@@ -130,6 +145,7 @@ int main(int argc, char *argv[]) {
 			printf("Fork mappers failed");
 			return 1;
 		}
+		//closing the pipe
 		close(fd[0]);
 		close(fd[1]);
 	}

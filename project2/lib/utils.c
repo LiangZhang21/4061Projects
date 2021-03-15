@@ -30,22 +30,27 @@ ssize_t getLineFromFile(FILE *fp, char *line, size_t len) {
 // The list of intermediate file names are stored in myTasks array
 int getReducerTasks(int nReducers, int reducerID, char *intermediateDir, char **myTasks) {
 	int i;
-	int counter = 1;
-	int sum = 0;
+	int counter = 1; //use counter for file names in each folder
+	int sum = 0; //use total sum for return
 	for(i = reducerID; i <= 20; i += nReducers){
 		char folder_buf[400];
 		sprintf(folder_buf, "%s/%d", intermediateDir, i);
+		//opening up the folder
 		DIR *dir = opendir(folder_buf);
 		struct dirent *entry;
 		if (dir == NULL){ //error check
 			printf("Failed to open directory\n");
 			return 1;
 		}
+		//while inside the folder it is not empty
 		while((entry = readdir(dir)) != NULL){
+			//skipping "." and ".."
 			if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
 			char *file_buf = malloc(sizeof(char) * 2000);
 			sprintf(file_buf, "%s/m%d.txt", folder_buf, counter);
+			//adding the path to the array.
 			myTasks[sum] = file_buf;	
+			//increments the sum and counter
 			sum++;
 			counter++;
 		}
