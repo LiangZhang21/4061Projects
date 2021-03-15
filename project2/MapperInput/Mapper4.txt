@@ -1,2 +1,0 @@
-test/T1/1.txt
-test/T1/4.txt
