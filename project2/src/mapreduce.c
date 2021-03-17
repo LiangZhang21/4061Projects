@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "Failed to create and open the file.\n");
 			exit(EXIT_FAILURE);
 		}
-		//Distribute the files among the into each stream mappers
+		//Distribute the files among each stream mappers
 		int j;
 		for (j = i; j < textfile_counter; j += nMappers)
 		{
@@ -247,10 +247,10 @@ int getNames(char *path)
 		{
 			getNames(next);
 		}
-		else if((entry->d_type == DT_REG))
-		{
+		else if((entry->d_type == DT_REG)) //Any type other than regular will not go in, including symbolic linked.
+		{	
 			stat(next, &stat_buf);
-			//check if the file is hard linked or not, if so skip it.
+			//check if the file is hard linked or not. If so, skip it.
 			if(stat_buf.st_nlink == 1){
 				//adding the path into the files_names array and increment the counter
 				char *buf = malloc(sizeof(char) * maxFileNameLength); // buf is freed in the main function

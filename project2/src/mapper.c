@@ -49,14 +49,14 @@ int main(int argc, char *argv[])
 	//feel free to change
 	char buf[chunkSize];
 	ssize_t bytesRead;
-	//recevie from the pipe and call the parse() function
+	//recevie from the pipe and pass the information into the parse() function
 	
 	while ((bytesRead = getLineFromFile(stdin, buf, chunkSize)) > 0)
 	{
 		parse(buf);
 	}
 	
-
+	//close and error check
 	if (close(STDIN_FILENO))
 	{
 		fprintf(stderr, "ERROR: close failed\n");
