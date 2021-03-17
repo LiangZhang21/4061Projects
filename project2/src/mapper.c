@@ -48,17 +48,14 @@ int main(int argc, char *argv[])
 	// you can read lines from pipes (from STDIN) (read lines in a while loop)
 	//feel free to change
 	char buf[chunkSize];
+	ssize_t bytesRead;
 	//recevie from the pipe and call the parse() function
-	int bytesRead;
-	while ((bytesRead = read(STDIN_FILENO, buf, chunkSize)) > 0)
+	
+	while ((bytesRead = getLineFromFile(stdin, buf, chunkSize)) > 0)
 	{
 		parse(buf);
 	}
-	if (bytesRead == -1)
-	{
-		fprintf(stderr, "ERROR: read failed\n");
-		return EXIT_FAILURE;
-	}
+	
 
 	if (close(STDIN_FILENO))
 	{

@@ -8,10 +8,11 @@
 void emit(char *inputFileName)
 {
 	char buffer[chunkSize];
+	int size;
 	FILE *fd2 = getFilePointer(inputFileName); //open up the file
-	while (getLineFromFile(fd2, buffer, chunkSize) > 0)
+	while ( size = getLineFromFile(fd2, buffer, chunkSize) > 0)
 	{
-		int bytesWrite = write(STDOUT_FILENO, buffer, chunkSize); //writing into the pipe
+		int bytesWrite = write(STDOUT_FILENO, buffer, size); //writing into the pipe
 		if (bytesWrite == -1)
 		{
 			fprintf(stderr, "ERROR: write failed\n");
