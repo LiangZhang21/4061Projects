@@ -1,9 +1,9 @@
 # Project 2 : IPC MapReduce - Word counts of different lengths
 
 ## Group Members
-test machine: virtual_box_linux_machine  
-data: 03/15/2021  
-name:ZhaoDong Wang, DeHui Zhang, Liang Zhang  
+Test machine: virtual_box_linux_machine  
+Data: 03/15/2021  
+Names:ZhaoDong Wang, DeHui Zhang, Liang Zhang  
 x500: wang9436, zhan6146, zhan6122  
 
 ZhaoDong Wang  
@@ -16,7 +16,7 @@ Readme.md, mapreduce.c, stream.c, mapper.c, reducer.c
 The purpose of this program is to use a single machine to perform MapReduce programming model by using proccesses.  
 The program use the following files: mapreduce.c, stream.c, mapper.c, reducer.c to construct the output.  
 And in the  output, it contains an intermediate folder and a final output folder.  
-*Any hard linked files or symbolic linked files will be ignored*
+<*Any hard linked files or symbolic linked files will be ignored*>  
 First, the program distribute the files evently to each processes and use pipes to deilver the information from each stream mapper to mapper.  
 Then the program sum up all the counts value by each proccesses from the intermediate folder. Finally, it will produce the final result in the final output folder.  
 Text files from the final output folder shows the length of each words and the sum of its counts value. 
@@ -24,8 +24,8 @@ Text files from the final output folder shows the length of each words and the s
 The followings display more details about what mapreduce.c, stream.c, mapper.c, reducer.c does.  
 
 ## Master  (mapreduce.c)
-First the master will create an input directory, then use the getName() function to distribute the tasks evently for each mappers.
-*The getName() will create a text file for each mapper and inside the text file it contains the path for the assigned text files.*
+First the master will create an input directory, then use the getName() function to distribute the tasks evently for each mappers.  
+<*The getName() will create a text file for each mapper and inside the text file it contains the path for the assigned text files.*>  
 Then it will set up pipes form stream mappers to mappers.
 The master function spawns the same amount of stream mappers and mapper processes according the input amount of nMappers.  
 Each process will call the exec() function and run the stream.c and mapper.c file. The parent will wait untill the processes return before moving to the next step.  
@@ -33,8 +33,8 @@ And we repeat the same steps for reduce, where it spawns the same amount of redu
 Each process will call the exec() function and run the ruducer.c. And the parent will wait untill all the processes ended.  
 
 ## Stream (stream.c)
-The stream.c file when it executed, it will go into the MapperInput folder and read into the assigned text files.  
-Inside each text files, it contains the paths of the assigned tasks, it will use the path to extract the inforamtion from the files, and input it into the pipes.
+The stream.c file when it executed, it will go into the *MapperInput* folder and read into the assigned text files.  
+Inside each text files, it contains the paths of the assigned tasks, and it will use the paths to extract the inforamtion and input it into the pipes.
 
 ## Map  (mapper.c)
 The mapper.c file will first recevie the information form the pipes, then it will use the function parse() read the contents and put the value of the words count into an array where its indices is its words length.  
@@ -54,8 +54,7 @@ The function we coded in the utils.c file is getReducerTasks(), this function wi
 	
 ## Execution
 	// always call make clean and make before you start execution
-	// ./mapreduce nMappers nReducer inputFileDir
-	> ./mapreduce 5 3 test/T0
+	> ./mapreduce #mappers #reducers test/T0 (or test/T1 ... so on.)
 
 ## Result
 Check output folder for all the results
