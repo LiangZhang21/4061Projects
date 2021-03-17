@@ -224,6 +224,7 @@ int getNames(char *path)
 {
 	int file_counter;
 	DIR *dir = opendir(path); //open the path directory
+	struct stat stat_buf;
 	struct dirent *entry;
 	if (dir == NULL)
 	{ //error checking
@@ -235,25 +236,31 @@ int getNames(char *path)
 	{ //Skipping "." and ".."
 		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
 			continue;
+		//appending file path
+		char next[strlen(path) + strlen(entry->d_name) + 2];
+		next[0] = '\0';
+		strcat(next, path);
+		strcat(next, "/");
+		strcat(next, entry->d_name);
+		
 		if ((entry->d_type == DT_DIR))
 		{
-			char next[strlen(path) + strlen(entry->d_name) + 2];
-			next[0] = '\0';
-			strcat(next, path);
-			strcat(next, "/");
-			strcat(next, entry->d_name);
 			getNames(next);
 		}
-		else
+		else if((entry->d_type == DT_REG))
 		{
-			//adding the path into the files_names array and increment the counter
-			char *buf = malloc(sizeof(char) * maxFileNameLength); // buf is freed in the main function
-			buf[0] = '\0';
-			strcat(buf, path);
-			strcat(buf, "/");
-			strcat(buf, entry->d_name);
-			file_names[textfile_counter] = buf;
-			textfile_counter++;
+			stat(next, &stat_buf);
+			//check if the file is hard linked or not, if so skip it.
+			if(stat_buf.st_nlink == 1){
+				//adding the path into the files_names array and increment the counter
+				char *buf = malloc(sizeof(char) * maxFileNameLength); // buf is freed in the main function
+				buf[0] = '\0';
+				strcat(buf, path);
+				strcat(buf, "/");
+				strcat(buf, entry->d_name);
+				file_names[textfile_counter] = buf;
+				textfile_counter++;
+			}
 		}
 	}
 	if (closedir(dir))
