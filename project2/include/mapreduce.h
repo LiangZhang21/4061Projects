@@ -10,5 +10,7 @@
 #include "utils.h"
 
 char *inputFileDir;
+int textfile_counter = 0;
+char** file_names;
 
 #endif
