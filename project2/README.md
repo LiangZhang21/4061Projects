@@ -15,7 +15,7 @@ Readme.md, mapreduce.c, stream.c, mapper.c, reducer.c
 ## Purpose
 The purpose of this program is to use a single machine to perform MapReduce programming model by using proccesses.  
 The program use the following files: mapreduce.c, stream.c, mapper.c, reducer.c to construct the output.  
-And in the  output, it contains an intermediate folder and a final output folder.  
+Inside the output folder, it contains an intermediate folder and a final output folder.  
 <*Any hard linked files or symbolic linked files will be ignored*>  
 First, the program distribute the files evently to each processes and use pipes to deilver the information from each stream mapper to mapper.  
 Then the program sum up all the counts value by each proccesses from the intermediate folder. Finally, it will produce the final result in the final output folder.  
