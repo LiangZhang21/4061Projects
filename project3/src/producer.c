@@ -28,6 +28,7 @@ void *producer(void *arg){
 			temp -> word = word_hold;
 			last -> next = temp;
 			last = temp;
+			//printf("%s\n", last->word);
 			//unlock
 			pthread_mutex_unlock(&mutex); 	
     	}	

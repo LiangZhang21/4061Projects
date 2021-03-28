@@ -11,11 +11,9 @@ void writeFinalDSToFiles(void) {
 void printList(){
 	struct node_t *temp;
 	temp = head_node;
-	while(temp -> next != NULL){
+	while( (temp = temp -> next) != NULL){
 		printf("word: %s\n", temp -> word);
-		temp = temp -> next;
 	}
-
 }
 
 int main(int argc, char *argv[]){
