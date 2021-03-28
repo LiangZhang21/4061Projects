@@ -1,0 +1,51 @@
+consumer 0
+consumer 1
+consumer 2
+consumer 3
+consumer 4
+consumer 5
+consumer 6
+consumer 7
+consumer 8
+consumer 9
+producer
+producer: 0
+consumer 0: 0
+producer: 1
+producer: 2
+producer: 3
+producer: 4
+consumer 1: 1
+consumer 2: 2
+consumer 2: 3
+producer: 5
+consumer 3: 4
+consumer 3: 5
+producer: 6
+producer: 7
+consumer 6: 6
+consumer 1: 7
+producer: 8
+consumer 8: 8
+producer: 9
+consumer 9: 9
+producer: -1
+consumer 0: -1
+producer: -1
+producer: -1
+consumer 3: -1
+consumer 2: -1
+producer: -1
+consumer 4: -1
+producer: -1
+consumer 5: -1
+producer: -1
+consumer 6: -1
+producer: -1
+producer: -1
+consumer 7: -1
+consumer 1: -1
+producer: -1
+consumer 8: -1
+producer: -1
+consumer 9: -1
