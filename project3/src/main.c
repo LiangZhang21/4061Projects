@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
     //Write the final output
     writeFinalDSToFiles();
     
-    //printList();
+    printList();
     
     return 0; 
 }

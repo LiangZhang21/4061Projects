@@ -16,18 +16,21 @@ void *producer(void *arg){
     struct node_t *last;
     last = head_node;
     char readbuf[chunkSize];
-    while(getLineFromFile(fp, readbuf, chunkSize) > 0){
-    	pthread_mutex_lock(&mutex);
-    	temp = (struct node_t*)malloc(sizeof(struct node_t));
-    	char word_hold[400];
-    	strcpy(word_hold, readbuf); 
-    	temp -> word = word_hold;
-    	temp -> next = NULL;
-    	last -> next = temp;
-    	last = temp;
-    	printf("%s\n", temp -> word);
-    	//unlock
-    	pthread_mutex_unlock(&mutex); 		
+    int word_size;
+    while((word_size = getLineFromFile(fp, readbuf, chunkSize)) > 0){	
+    	if(strcmp(readbuf,"\n") != 0){
+			temp = (struct node_t*)malloc(sizeof(struct node_t));
+			char* word_hold;
+			word_hold = malloc(sizeof(char)*word_size);
+			strcpy(word_hold, readbuf); 
+			//lock
+			pthread_mutex_lock(&mutex);
+			temp -> word = word_hold;
+			last -> next = temp;
+			last = temp;
+			//unlock
+			pthread_mutex_unlock(&mutex); 	
+    	}	
     	
     }
     
