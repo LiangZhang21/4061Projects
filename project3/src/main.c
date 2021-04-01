@@ -35,6 +35,12 @@ int main(int argc, char *argv[]){
     char* path = argv[2];
     pthread_t th[consumers+1];
     pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&full_cond, NULL);
+    pthread_cond_init(&empty_cond, NULL);
+    
+    item_hold_size = 20;
+	list_size = 0;
+	done = false;
 
     //TODO: create producer and consumer threads
     //create producer
@@ -60,7 +66,7 @@ int main(int argc, char *argv[]){
     //Write the final output
     writeFinalDSToFiles();
     
-    printList();
+    //printList();
     
     return 0; 
 }

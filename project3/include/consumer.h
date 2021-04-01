@@ -4,5 +4,6 @@
 #include "utils.h"
 
 void *consumer(void *arg);
+int finalDS[MaxWordLength];
 
 #endif
