@@ -78,7 +78,8 @@ int main(int argc, char *argv[]){
 		
 	for(int i = 1; i <= consumers; i++){
 		//create consumers
-		int* id = i;
+		int* id = malloc(sizeof(int));
+		*id = i;
 		if(pthread_create(&th[i], NULL, consumer, id) != 0){
 				perror("Failed to create consumer thread");
 		}	

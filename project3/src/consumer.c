@@ -30,8 +30,8 @@ void parse(int ID){
 // consumer function
 void *consumer(void *arg){
     char log_buf[200];
-    int id = (int*)arg;
-    //printf("id: %d\n", id);
+    int id = *(int*)arg;
+    printf("id: %d\n", id);
     //TODO: keep reading from queue and process the data
     // feel free to change   
     if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)){
