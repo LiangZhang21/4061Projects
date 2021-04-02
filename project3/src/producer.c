@@ -37,7 +37,7 @@ void *producer(void *arg){
 				last = head_node -> next;
 			}
 			list_size++;
-			printf("produced: %s\n", last->word);
+			//printf("produced: %s\n", last->word);
 			//unlock
 			pthread_mutex_unlock(&mutex); 	
 			pthread_cond_signal(&full_cond);	

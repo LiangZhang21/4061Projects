@@ -7,14 +7,14 @@ void parse(){
 	char *line;
 	struct node_t *temp;
 	temp = head_node -> next;
-	printf("consumed: %s\n", temp -> word);
+	//printf("consumed: %s\n", temp -> word);
 	line = malloc(sizeof(char)*strlen(temp->word)+1);
 	strcpy(line, temp -> word);
-	char* token = strtok(line, "\n");
-	token = strtok(token, " ");
+	char* token = strtok_r(line, "\n", &line);
+	token = strtok_r(token, " ", &line);
 	while(token != NULL){
 		finalDS[strlen(token)-1]++;
-		token = strtok(NULL, " ");
+		token = strtok_r(NULL, " ", &line);
 	}
 	head_node -> next = temp -> next;	
 }

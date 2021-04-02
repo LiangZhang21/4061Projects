@@ -6,6 +6,14 @@
  */
 
 void writeFinalDSToFiles(void) {
+	int i;
+	char value_buf[200];
+	for(i = 0; i < MaxWordLength; i++){
+		sprintf(value_buf, "%d %d\n", i+1, finalDS[i]);
+		//if(finalDS[i] != 0){
+			writeLineToFile(finalDir, value_buf);
+		//}
+	}
 }
 
 void printList(){

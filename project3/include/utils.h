@@ -30,6 +30,7 @@ pthread_cond_t empty_cond;
 int item_hold_size;
 int list_size;
 bool done;
+int finalDS[MaxWordLength];
 /* file I/O */
 /**
  * Get a pointer to a opened file based on the file name
