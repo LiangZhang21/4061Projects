@@ -51,8 +51,8 @@ void *producer(void *arg){
 			list_size++;	
 			//printf("produced: %s\n", last->word);		
 			//unlock
-			pthread_mutex_unlock(&mutex); 	
-			pthread_cond_signal(&full_cond);	
+			pthread_cond_signal(&full_cond);
+			pthread_mutex_unlock(&mutex); 			
     	}
     	if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0) ){			
 				sprintf(log_buf, "producer: %d\n", line);

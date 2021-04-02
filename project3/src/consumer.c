@@ -31,7 +31,7 @@ void parse(int ID){
 void *consumer(void *arg){
     char log_buf[200];
     int id = *(int*)arg;
-    printf("id: %d\n", id);
+    //printf("id: %d\n", id);
     //TODO: keep reading from queue and process the data
     // feel free to change   
     if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)){
@@ -51,10 +51,11 @@ void *consumer(void *arg){
     	}
         parse(id);
         list_size--;
-        pthread_mutex_unlock(&mutex);
+        
         if(boundedBuf){
         	pthread_cond_signal(&empty_cond); 
-        }      
+        } 
+        pthread_mutex_unlock(&mutex);     
     }
     
 
