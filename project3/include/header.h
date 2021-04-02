@@ -8,5 +8,4 @@
 char *finalDir = "output/result.txt";
 char *logDir = "output/log.txt";
 
-
 #endif

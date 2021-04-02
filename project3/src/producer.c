@@ -18,6 +18,16 @@ void *producer(void *arg){
     last = head_node;
     char readbuf[chunkSize];
     int word_size;
+    char log_buf[200];
+    int line = 0;
+    
+    if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0) ){
+    	if(line == 0){
+			strcpy(log_buf, "producer\n");
+			write(fd, log_buf, sizeof(char) * strlen(log_buf));
+		}			
+	}	
+
     while((word_size = getLineFromFile(fp, readbuf, chunkSize)) > 0){	
     	if(strcmp(readbuf,"\n") != 0){
 			new_node = (struct node_t*)malloc(sizeof(struct node_t));
@@ -26,8 +36,10 @@ void *producer(void *arg){
 			strcpy(word_hold, readbuf); 
 			//lock
 			pthread_mutex_lock(&mutex);
-			while(list_size >= item_hold_size)	
-				pthread_cond_wait(&empty_cond, &mutex);
+			if(boundedBuf){
+				while(list_size >= queueSize)	
+					pthread_cond_wait(&empty_cond, &mutex);
+			}
 			new_node -> word = word_hold;
 			last -> next = new_node;
 			if(head_node -> next != NULL){
@@ -36,12 +48,18 @@ void *producer(void *arg){
 				head_node -> next = new_node;
 				last = head_node -> next;
 			}
-			list_size++;
-			//printf("produced: %s\n", last->word);
+			list_size++;	
+			//printf("produced: %s\n", last->word);		
 			//unlock
 			pthread_mutex_unlock(&mutex); 	
 			pthread_cond_signal(&full_cond);	
-    	}	  	
+    	}
+    	if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0) ){			
+				sprintf(log_buf, "producer: %d\n", line);
+				write(fd, log_buf, sizeof(char) * strlen(log_buf));	
+				line++;	
+			} 	
+		
     }
     done = 1;
     pthread_cond_broadcast(&full_cond);

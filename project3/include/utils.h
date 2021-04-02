@@ -27,10 +27,15 @@ struct node_t *head_node;
 pthread_mutex_t mutex;  
 pthread_cond_t full_cond;
 pthread_cond_t empty_cond;
-int item_hold_size;
 int list_size;
 bool done;
+bool boundedBuf;
 int finalDS[MaxWordLength];
+char* option;
+int queueSize;
+int fd;
+int line_num;
+
 /* file I/O */
 /**
  * Get a pointer to a opened file based on the file name
