@@ -82,10 +82,9 @@ int main(int argc, char *argv[]){
 		*id = i;
 		if(pthread_create(&th[i], NULL, consumer, id) != 0){
 				perror("Failed to create consumer thread");
-		}	
-
+		}		
 	}
-
+	
     //TODO: wait for all threads to complete execution
     for(int i = 0; i <= consumers; i++){
     	if(pthread_join(th[i], NULL) != 0){
@@ -101,8 +100,8 @@ int main(int argc, char *argv[]){
     
     //Write the final output
     writeFinalDSToFiles();
-    
-    //printList();
+    free(head_node);
+    close(fd);
     
     return 0; 
 }

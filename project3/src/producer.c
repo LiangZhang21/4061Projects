@@ -20,6 +20,7 @@ void *producer(void *arg){
     int word_size;
     char log_buf[200];
     int line = 0;
+    char* word_hold;
     
     if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0) ){
     	if(line == 0){
@@ -30,8 +31,7 @@ void *producer(void *arg){
 
     while((word_size = getLineFromFile(fp, readbuf, chunkSize)) > 0){	
     	if(strcmp(readbuf,"\n") != 0){
-			new_node = (struct node_t*)malloc(sizeof(struct node_t));
-			char* word_hold;
+			new_node = (struct node_t*)malloc(sizeof(struct node_t));		
 			word_hold = malloc(sizeof(char)*word_size+1);
 			strcpy(word_hold, readbuf); 
 			//lock
@@ -55,15 +55,16 @@ void *producer(void *arg){
 			pthread_mutex_unlock(&mutex); 			
     	}
     	if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0) ){			
-				sprintf(log_buf, "producer: %d\n", line);
-				write(fd, log_buf, sizeof(char) * strlen(log_buf));	
-				line++;	
+			sprintf(log_buf, "producer: %d\n", line);
+			write(fd, log_buf, sizeof(char) * strlen(log_buf));	
+			line++;	
 			} 	
-		
     }
     done = 1;
     pthread_cond_broadcast(&full_cond);
     // cleanup and exit
+    free(fp);
+    
     return NULL; 
 }
 

@@ -4,18 +4,16 @@
  * parse lines from the queue, and count words by word length
  */
 void parse(int ID){
-	char *line;
+	char **line;
 	char log_buf2[200];
 	struct node_t *temp;
 	temp = head_node -> next;
 	//printf("consumed: %s\n", temp -> word);
-	line = malloc(sizeof(char)*strlen(temp->word)+1);
-	strcpy(line, temp -> word);
-	char* token = strtok_r(line, "\n", &line);
-	token = strtok_r(token, " ", &line);
+	char* token = strtok_r(temp -> word, "\n", line);
+	token = strtok_r(token, " ", line);
 	while(token != NULL){
 		finalDS[strlen(token)-1]++;
-		token = strtok_r(NULL, " ", &line);
+		token = strtok_r(NULL, " ", line);
 	}
 	head_node -> next = temp -> next;	
 	int id = ID;
@@ -23,8 +21,9 @@ void parse(int ID){
 		sprintf(log_buf2, "consumer %d: %d\n", id-1, line_num);
 		write(fd, log_buf2, sizeof(char) * strlen(log_buf2));	
 		line_num++;	
-	} 	
-	
+	} 		
+	//free(temp -> word);
+	//free(temp);
 }
 
 // consumer function
@@ -57,9 +56,9 @@ void *consumer(void *arg){
         } 
         pthread_mutex_unlock(&mutex);     
     }
-    
 
     //TODO: update the global array
+    free(arg);
     
     return NULL; 
 }
