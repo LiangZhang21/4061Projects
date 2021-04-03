@@ -1,13 +1,3 @@
-consumer 5
-consumer 6
-consumer 7
-consumer 8
-consumer 9
-consumer 4
-consumer 3
-consumer 2
-consumer 1
-consumer 0
 producer
 producer: 0
 producer: 1
@@ -25,6 +15,7 @@ producer: 12
 producer: 13
 producer: 14
 producer: 15
+consumer 0
 producer: 16
 producer: 17
 producer: 18
@@ -32,3 +23,23 @@ producer: 19
 producer: 20
 producer: 21
 producer: 22
+consumer 1
+consumer 0: 0
+consumer 0: 1
+consumer 0: 2
+consumer 0: 3
+consumer 0: 4
+consumer 0: 5
+consumer 0: 6
+consumer 0: 7
+consumer 0: 8
+consumer 0: 9
+consumer 0: 10
+consumer 0: 11
+consumer 0: 12
+consumer 0: 13
+consumer 0: 14
+consumer 0: 15
+consumer 0: 16
+consumer 0: 17
+producer: -1

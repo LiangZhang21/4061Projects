@@ -14,8 +14,8 @@ void *producer(void *arg){
     FILE* fp = getFilePointer(path);
     //setting up linked list    
     struct node_t *new_node;
-    struct node_t *last;
-    last = head_node;
+    struct node_t *current_node;
+    current_node = head_node;
     char readbuf[chunkSize];
     int word_size;
     char log_buf[200];
@@ -32,24 +32,24 @@ void *producer(void *arg){
     while((word_size = getLineFromFile(fp, readbuf, chunkSize)) > 0){	
     	if(strcmp(readbuf,"\n") != 0){
 			new_node = (struct node_t*)malloc(sizeof(struct node_t));		
-			word_hold = malloc(sizeof(char)*word_size+1);
-			strcpy(word_hold, readbuf); 
+			word_hold = malloc(sizeof(char)*word_size+1);		
 			//lock
 			pthread_mutex_lock(&mutex);
+			strcpy(word_hold, readbuf); 
 			if(boundedBuf){
 				while(list_size >= queueSize)	
 					pthread_cond_wait(&empty_cond, &mutex);
 			}
 			new_node -> word = word_hold;
-			last -> next = new_node;
 			if(head_node -> next != NULL){
-				last = new_node;			
+				current_node -> next = new_node;
+				current_node = new_node;				
 			}else{
 				head_node -> next = new_node;
-				last = head_node -> next;
+				current_node = head_node -> next;
 			}
 			list_size++;	
-			//printf("produced: %s\n", last->word);		
+			//printf("produced: %s\n", current_node->word);		
 			//unlock
 			pthread_cond_signal(&full_cond);
 			pthread_mutex_unlock(&mutex); 			
@@ -58,12 +58,12 @@ void *producer(void *arg){
 			sprintf(log_buf, "producer: %d\n", line);
 			write(fd, log_buf, sizeof(char) * strlen(log_buf));	
 			line++;	
-			} 	
+		} 	
     }
     done = 1;
     pthread_cond_broadcast(&full_cond);
     // cleanup and exit
-    free(fp);
+    fclose(fp);
     
     return NULL; 
 }
