@@ -3,64 +3,71 @@
 /**
  * parse lines from the queue, and count words by word length
  */
-void parse(int ID){
-	char *line;
-	char log_buf2[200];
-	struct node_t *temp;
-	temp = head_node -> next;
-	//printf("consumed: %s\n", temp -> word);
-	char* token = strtok_r(temp -> word, "\n", &line);
-	token = strtok_r(token, " ", &line);
-	while(token != NULL){
-		finalDS[strlen(token)-1]++;
-		token = strtok_r(NULL, " ", &line);
-	}
-	head_node -> next = temp -> next;	
-	int id = ID;
-	if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)){			
-		sprintf(log_buf2, "consumer %d: %d\n", id-1, line_num);
-		write(fd, log_buf2, sizeof(char) * strlen(log_buf2));	
-		line_num++;	
-	} 		
-	free(temp -> word);
-	free(temp);
+void parse(int id) {
+    if ((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)) {
+        fprintf(fp, "consumer %d: %d\n", id, line_num);
+        line_num++;
+    }
+    char *line;
+    struct node_t *temp;
+    temp = head_node->next;
+    if (temp->word[0] != '\n') {
+        char *token = strtok_r(temp->word, "\n", &line);
+        token = strtok_r(token, " ", &line);
+        while (token != NULL) {
+            finalDS[strlen(token) - 1]++;
+            token = strtok_r(NULL, " ", &line);
+        }
+    }
+    head_node->next = temp->next;
+    free(temp->word);
+    free(temp);
 }
 
 // consumer function
-void *consumer(void *arg){
-    char log_buf[200];
-    int id = *(int*)arg;
-    //printf("id: %d\n", id);
-    //TODO: keep reading from queue and process the data
-    // feel free to change   
-    if((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)){
-    	if(line_num == 0){
- 	   		sprintf(log_buf, "consumer %d\n", id-1);
-			write(fd, log_buf, sizeof(char) * strlen(log_buf));
-		}			
-	}	
-
-    while(1){
-    	pthread_mutex_lock(&mutex);
-    	while((list_size <= 0) && !done)
-    		pthread_cond_wait(&full_cond, &mutex);
-    	if((list_size <= 0) && done){
-    		pthread_mutex_unlock(&mutex);
-    		break;  	
-    	}
-        parse(id);
-        list_size--;
-        
-        if(boundedBuf){
-        	pthread_cond_signal(&empty_cond); 
-        } 
-        pthread_mutex_unlock(&mutex);     
+void *consumer(void *arg) {
+    int id = *(int *)arg - 1;
+    // keep reading from queue and process the data
+    if ((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)) {
+        fprintf(fp, "consumer %d\n", id);
     }
 
-    //TODO: update the global array
+    while (1) {
+        if (pthread_mutex_lock(&mutex)) {
+			fprintf(stderr, "Consumer failed to obtain the lock\n");
+			exit(1);
+		}
+        while ((list_size <= 0) && !done) {
+            if (pthread_cond_wait(&full_cond, &mutex)) {
+				fprintf(stderr, "Consumer failed to wait for an item\n");
+				exit(1);
+			}
+		}
+        if ((list_size <= 0) && done) {
+            if (pthread_mutex_unlock(&mutex)) {
+				fprintf(stderr, "Consumer failed to release the lock\n");
+				exit(1);
+			}
+            break;
+        }
+        parse(id);
+        list_size--;
+        if (boundedBuf) {
+            if (pthread_cond_signal(&empty_cond)) {
+				fprintf(stderr, "Consumer failed to signal the producer\n");
+				exit(1);
+			}
+        }
+        if (pthread_mutex_unlock(&mutex)) {
+			fprintf(stderr, "Consumer failed to release the lock\n");
+			exit(1);
+		}
+    }
+
+	if ((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)) {
+        fprintf(fp, "consumer %d: -1\n", id);
+    }
+
     free(arg);
-    
-    return NULL; 
+    return NULL;
 }
-
-

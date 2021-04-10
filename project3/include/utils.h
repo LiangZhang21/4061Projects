@@ -33,8 +33,8 @@ bool boundedBuf;
 int finalDS[MaxWordLength];
 char* option;
 int queueSize;
-int fd;
 int line_num;
+FILE *fp;
 
 /* file I/O */
 /**
