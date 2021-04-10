@@ -41,6 +41,7 @@ void *producer(void *arg){
 					pthread_cond_wait(&empty_cond, &mutex);
 			}
 			new_node -> word = word_hold;
+			new_node -> next = NULL;
 			if(head_node -> next != NULL){
 				current_node -> next = new_node;
 				current_node = new_node;				
