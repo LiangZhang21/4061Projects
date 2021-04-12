@@ -20,20 +20,22 @@ void *producer(void *arg) {
     int word_size;
     int line = 0;
     char *word_hold;
-
+	
     if ((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)) {
         fprintf(fp, "producer\n");
     }
-
+	//continue to read while the file isn't empty
     while ((word_size = getLineFromFile(file, readbuf, chunkSize)) > 0) {
+    	//creating a new node and data
         new_node = (struct node_t *)malloc(sizeof(struct node_t));
         word_hold = malloc(sizeof(char) * word_size + 1);
-        // lock
+        // locking the critial section
         if (pthread_mutex_lock(&mutex)) {
             fprintf(stderr, "Producer failed to obtain the mutex lock\n");
             exit(1);
         }
         strcpy(word_hold, readbuf);
+        //if the bounded option is enabled, we will wait if the queue size is full
         if (boundedBuf) {
             while (list_size >= queueSize) {
                 if (pthread_cond_wait(&empty_cond, &mutex)) {
@@ -42,6 +44,7 @@ void *producer(void *arg) {
                 }
             }
         }
+        //adding a new node to the linked-list
         new_node->word = word_hold;
         new_node->next = NULL;
         if (head_node->next != NULL) {
@@ -52,7 +55,7 @@ void *producer(void *arg) {
             current_node = head_node->next;
         }
         list_size++;
-        // unlock
+        // unlocking the critial section and signal the consumers
         if (pthread_cond_signal(&full_cond)) {
             fprintf(stderr, "Producer failed to signal the consumers\n");
             exit(1);
@@ -61,11 +64,13 @@ void *producer(void *arg) {
             fprintf(stderr, "Producer failed to release the lock\n");
             exit(1);
         }
+        //print out the producer log if the option is enabled.
         if ((strcmp(option, "-p") == 0) || (strcmp(option, "-bp") == 0)) {
             fprintf(fp, "producer: %d\n", line);
             line++;
         }
     }
+    //trigger the done variable
     done = 1;
     if (pthread_cond_broadcast(&full_cond)) {
         fprintf(stderr, "Producer failed to send the EOF notification\n");

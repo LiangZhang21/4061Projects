@@ -4,7 +4,7 @@
  * Write final word count to a single file.
  * The path name should be output/result.txt
  */
-
+//This function is use to write out the final result into the final text file
 void writeFinalDSToFiles(void) {
     int i;
     char value_buf[200];
@@ -20,8 +20,10 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Incorrect arguments\n");
         return 1;
     } else {
+    	//If the argument size is equal to 4 then print out the log
         if (argc == 4) {
             option = argv[3];
+            //bounded buffer agrument must be size 5.
             if ((strcmp(argv[3], "-bp") == 0) || (strcmp(argv[3], "-b") == 0)) {
                 fprintf(stderr, "Incorrect arugment: require queue size\n");
                 return 1;
@@ -33,9 +35,11 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "Incorrect arguments\n");
                 return 1;
             }
+            //setting bounded buffer to true
             boundedBuf = 1;
         } else {
             option = "";
+            //setting bounded buffer to false
             boundedBuf = 0;
         }
     }
@@ -49,14 +53,18 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     char* path = argv[2];
+    //initialize the dummy node.
     head_node = (struct node_t*)malloc(sizeof(struct node_t));
     head_node->word = NULL;
     head_node->next = NULL;
+    //setting up the total amount of threads.
     pthread_t th[consumers + 1];
+    //initialize the lock
     if (pthread_mutex_init(&mutex, NULL)) {
         fprintf(stderr, "Failed to init mutex lock\n");
         return 1;
     }
+    //initialze the conditional variables.
     if (pthread_cond_init(&full_cond, NULL)) {
         fprintf(stderr, "Failed to init conditional variable\n");
         return 1;
