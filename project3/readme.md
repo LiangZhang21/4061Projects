@@ -22,13 +22,20 @@ Finally, the program will produce the final result using the array in the final 
 The followings display more details about what consumer.c, main.c, producer.c does.  
 
 ## Master  (main.c)
-  The main.c file create a producer thread and consumer threads; the producer thread will call the producer.c functions to read in the count of the word length and the consumers takes that data and call the writeFinalDSToFiles() output the data into a final text file.
+  The main.c file create a producer thread and consumer threads; the producer thread will call the producer.c  
+functions to read in the count of the word length and the consumers takes that data and call the  
+ writeFinalDSToFiles() output the data into a final text file.
 
 ## producer.c
-	The producer.c will read in each line of the file and store it into a linked-list. The critial section of the function uses mutex lock and conditional variable to prevent race condition. On "-p" or "-bp" command, it will also print out a log of the items it has produced.  
+	The producer.c will read in each line of the file and store it into a linked-list.  
+The critial section of the function uses mutex lock and conditional variable to prevent race condition.  
+On "-p" or "-bp" command, it will also print out a log of the items it has produced.  
 
 ## consumer.c
-	The consumer.c will read in data from the linked-list and split the line into words. Then, it will store the data into an array (where its index is the words' length and its value is the count). The critial section of the function also uses mutex lock and conditional variable to prevent race condition. On "-p" or "-bp" command, it will also print out a log of the items it has consumed.  
+	The consumer.c will read in data from the linked-list and split the line into words.  
+Then, it will store the data into an array (where its index is the words' length and its value is the  
+count). The critial section of the function also uses mutex lock and conditional variable to prevent race  
+condition. On "-p" or "-bp" command, it will also print out a log of the items it has consumed.  
 
 
 ## Compile
