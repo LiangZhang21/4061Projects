@@ -1,0 +1,16 @@
+2.2 The server program
+The server program is a multi-threaded server as shown in Figure 1.
+The server is responsible for listening for incoming socket connection
+requests and establishing connections with clients. The server waits for
+connections on the specified port. When it receives a connection request,
+it should spawn a new thread to handle that connection. The thread is
+responsible for handling a request from a client by reading client’s message
+from a socket set up between them, doing necessary computation
+(refer to Section 3. Communication Protocol) and sending a response
+to the client back through the socket. The thread should exit after it
+processes a request and closes the client connection. For example, a
+client sends to the server four different types of messages stated in
+Section 2.1, and for different threads handle individual messages using
+separate TCP connections between the client and server. For the extra credit,
+a thread handles all the multiple requests from a client. Please refer to
+Section 5. Extra Credits if you attempt it.
