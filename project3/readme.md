@@ -2,9 +2,9 @@
 
 ## Group Members
 Test machine: virtual_box_linux_machine  
-Data: 03/2/2021  
+Data: 4/12/2021  
 Names:ZhaoDong Wang, DeHui Zhang, Liang Zhang  
-x500: wang9436, zhan6146, zhan6122  
+x500: wang9436, zhan6146, zhan6122
 
 ZhaoDong Wang  
 Debugged, error checks, consumer.c, main.c, producer.c  
