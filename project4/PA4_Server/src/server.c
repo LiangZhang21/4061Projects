@@ -22,7 +22,15 @@ struct thread_args {
 		char* client_ip;
 };
 
-struct thread_args thread_arg1;
+struct thread_args thread_arg;
+
+void update_wstat(int* request_structure) {
+	int i;
+	for(i = 0; i < 20; i++){
+		words_length[i] += request_structure[i+2];
+		printf("index:%d, value:%d\n", i, words_length[i]);
+	}
+}
 
 void * socket_thread(void *arg) {
 	struct thread_args *new_arg = (struct thread_args*)arg;
@@ -31,20 +39,20 @@ void * socket_thread(void *arg) {
 	char* client_ip = new_arg -> client_ip;
 	int client_port = new_arg -> client_port;
 	int recv_buf[REQUEST_MSG_SIZE];
-	char send_buf[1000];
 	
 	if(read(new_socket, recv_buf, sizeof(recv_buf)) > 0) {
-		//printf("recv_buf: %d\n", recv_buf[1]);
+		printf("recv_buf: %d\n", recv_buf[0]);
 		if (recv_buf[0] == UPDATE_WSTAT ) {
-			
+			printf("halowolrd\n");
+			printf("[%d] UPDATE_WSTAT\n", client_ID);
+			update_wstat(recv_buf);
 		} else if (recv_buf[0] == GET_MY_UPDATES) {
 			
 		} else if (recv_buf[0] == GET_ALL_UPDATES) {
 			
 		} else if (recv_buf[0] == GET_WSTAT) {
 			printf("[%d] GET_WSTAT\n", client_ID);
-			strcpy(send_buf, "Hello Word");
-			write(new_socket, send_buf, 1000);
+			write(new_socket, words_length, sizeof(words_length));
 		}
 		
 	}
@@ -84,7 +92,7 @@ int main(int argc, char *argv[]) {
 	
 	// Creating a struct for thread args
 	
-	thread_arg1.thread_count = 0;
+	thread_arg.thread_count = 0;
 	
     while (1) {
 
@@ -93,24 +101,24 @@ int main(int argc, char *argv[]) {
 		pthread_t new_thread[MAX_CONNECTIONS];
 		socklen_t size = sizeof(struct sockaddr_in);
 		
-		if( (thread_arg1.clientfd = accept(sock, (struct sockaddr*) &clientAddress, &size)) < 0 ) {
+		if( (thread_arg.clientfd = accept(sock, (struct sockaddr*) &clientAddress, &size)) < 0 ) {
 			fprintf(stderr, "Failed to accpet socket.\n");
 		}
-		thread_arg1.client_ip = inet_ntoa(clientAddress.sin_addr);
-		thread_arg1.client_port = clientAddress.sin_port;
+		thread_arg.client_ip = inet_ntoa(clientAddress.sin_addr);
+		thread_arg.client_port = clientAddress.sin_port;
 		//printf("%s\n", clientIpAddr);
-		printf("open connection from %s:%d\n", thread_arg1.client_ip, thread_arg1.client_port);
+		printf("open connection from %s:%d\n", thread_arg.client_ip, thread_arg.client_port);
 		
-		if( pthread_create(&new_thread[thread_arg1.thread_count++], NULL, socket_thread, &thread_arg1) != 0 ) {
+		if( pthread_create(&new_thread[thread_arg.thread_count++], NULL, socket_thread, &thread_arg) != 0 ) {
 			fprintf(stderr, "Failed to create socket thread.\n");
 		}
 		
-		if(thread_arg1.thread_count >= MAX_CONNECTIONS) {
+		if(thread_arg.thread_count >= MAX_CONNECTIONS) {
 			int i;
 			for(i = 0; i < 50; i++) {
 				pthread_join(new_thread[i], NULL);
 			}
-			thread_arg1.thread_count = 0;
+			thread_arg.thread_count = 0;
 		}
 		
     }
