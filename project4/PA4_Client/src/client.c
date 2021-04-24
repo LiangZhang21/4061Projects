@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // spawn client processes
     pid_t client;
     
-    int request_method = 4;
+    int request_method = 2;
     
 	for(i = 0; i < clients_num; i++){
 		if( (client = fork()) == 0 ) {
@@ -105,11 +105,25 @@ int main(int argc, char *argv[]) {
 				} 
 				//GET_MY_UPDATES
 				else if (request_method == GET_MY_UPDATES) {
+					request_structure[0] = 2;
+					write(sockfd, request_structure, sizeof(request_structure));
 				
+					int read_buf[LONG_RESPONSE_MSG_SIZE];
+					read(sockfd, read_buf, sizeof(read_buf));
+					printf("[%d] GET_MY_UPDATES: %d %d\n", i, 1, read_buf[i]);
 				} 
 				//GET_ALL_UPDATES
 				else if (request_method == GET_ALL_UPDATES) {
+					request_structure[0] = 3;
+					write(sockfd, request_structure, sizeof(request_structure));
 				
+					int read_buf[LONG_RESPONSE_MSG_SIZE];
+					read(sockfd, read_buf, sizeof(read_buf));
+					printf("[%d] GET_ALL_UPDATES: %d ", i, 1);
+					for(j = 0; j < 20; j++){
+						printf("%d", read_buf[i]);
+					}
+					printf("\n");
 				} 
 				//GET_WSTAT
 				else if (request_method == GET_WSTAT) {		
