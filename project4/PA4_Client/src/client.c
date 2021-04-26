@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // spawn client processes
     pid_t client;
     
-    int request_method = 2;
+    int request_method = 3;
     
 	for(i = 0; i < clients_num; i++){
 		if( (client = fork()) == 0 ) {

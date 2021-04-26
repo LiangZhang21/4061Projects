@@ -19,6 +19,7 @@ pthread_mutex_t mutex;
 //Arrays for stats
 int words_length[20];
 int request_count[20];
+int empty_data[20];
 
 struct thread_args {
 		int thread_count;
@@ -46,28 +47,37 @@ void * socket_thread(void *arg) {
 	int recv_buf[REQUEST_MSG_SIZE];
 	
 	if(read(new_socket, recv_buf, sizeof(recv_buf)) > 0) {
-		printf("recv_buf: %d\n", recv_buf[1]);
-		if (recv_buf[0] == UPDATE_WSTAT ) {
-			printf("[%d] UPDATE_WSTAT\n", client_ID);
-			if (pthread_mutex_lock(&mutex)) {
-				fprintf(stderr, "failed to lock update_wstat");
-				pthread_exit((int *) 1);
+		//printf("recv_buf: %d\n", recv_buf[1]);
+		size_t recv_buf_length = sizeof(recv_buf)/sizeof(recv_buf[0]);
+		if (recv_buf_length == 23) {
+			if (recv_buf[0] == UPDATE_WSTAT ) {
+				printf("[%d] UPDATE_WSTAT\n", client_ID);
+				if (pthread_mutex_lock(&mutex)) {
+					fprintf(stderr, "failed to lock update_wstat");
+					pthread_exit((int *) 1);
+				}
+				update_wstat(recv_buf);
+				request_count[client_ID-1]++;
+				if (pthread_mutex_unlock(&mutex)) {
+					fprintf(stderr, "failed to unlock update_wstat");
+					pthread_exit((int *) 1);
+				}	
+			} else if (recv_buf[0] == GET_MY_UPDATES) {
+				printf("[%d] GET_MY_UPDATES\n", client_ID);
+				write(new_socket, request_count, sizeof(request_count));
+			} else if (recv_buf[0] == GET_ALL_UPDATES) {
+				printf("[%d] GET_ALL_UPDATES\n", client_ID);
+				write(new_socket, request_count, sizeof(request_count));
+			} else if (recv_buf[0] == GET_WSTAT) {
+				printf("[%d] GET_WSTAT\n", client_ID);
+				write(new_socket, words_length, sizeof(words_length));
+			} else {
+				printf("Invalid request\n");
+				write(new_socket, empty_data, sizeof(empty_data));
 			}
-			update_wstat(recv_buf);
-			request_count[client_ID-1]++;
-			if (pthread_mutex_unlock(&mutex)) {
-				fprintf(stderr, "failed to unlock update_wstat");
-				pthread_exit((int *) 1);
-			}	
-		} else if (recv_buf[0] == GET_MY_UPDATES) {
-			printf("[%d] GET_MY_UPDATES\n", client_ID);
-			write(new_socket, request_count, sizeof(request_count));
-		} else if (recv_buf[0] == GET_ALL_UPDATES) {
-			printf("[%d] GET_ALL_UPDATES\n", client_ID);
-			write(new_socket, request_count, sizeof(request_count));
-		} else if (recv_buf[0] == GET_WSTAT) {
-			printf("[%d] GET_WSTAT\n", client_ID);
-			write(new_socket, words_length, sizeof(words_length));
+		} else {
+			printf("Invalid request\n");
+			write(new_socket, empty_data, sizeof(empty_data));
 		}
 		
 	}
