@@ -79,10 +79,10 @@ int main(int argc, char *argv[]) {
     // spawn client processes
     pid_t client;
     
-    int request_method = 3;
+    int request_method = 2;
     
-	for(i = 0; i < clients_num; i++){
-		if( (client = fork()) == 0 ) {
+	for (i = 0; i < clients_num; i++){
+		if ( (client = fork()) == 0 ) {
 			int sockfd = socket(AF_INET , SOCK_STREAM , 0);
 			if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) == 0) {
 				printf("[%d] open connection\n", i+1);	
@@ -91,17 +91,20 @@ int main(int argc, char *argv[]) {
 				request_structure[1] = i+1;
 				//UPDATE_WSTAT
 				int j;
+				int client_ID = i+1;
 				if (request_method == UPDATE_WSTAT) {
 					//Get the words length stats		
-					getWordsStats(folder_name, i+1);
-					if(is_empty_array == 0) {
+					getWordsStats(folder_name, client_ID);
+					if (is_empty_array == 0) {
 						request_structure[0] = 1;
-						
-						for(j = 2; j < 23; j++) {
+						for (j = 2; j < 23; j++) {
 							request_structure[j] = wordsLength[j-2];
 						}
 						write(sockfd, request_structure, sizeof(request_structure));
 					}
+					int read_buf[LONG_RESPONSE_MSG_SIZE];
+					read(sockfd, read_buf, sizeof(read_buf));
+					printf("[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
 				} 
 				//GET_MY_UPDATES
 				else if (request_method == GET_MY_UPDATES) {
@@ -110,7 +113,7 @@ int main(int argc, char *argv[]) {
 				
 					int read_buf[LONG_RESPONSE_MSG_SIZE];
 					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] GET_MY_UPDATES: %d %d\n", i, 1, read_buf[i]);
+					printf("[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
 				} 
 				//GET_ALL_UPDATES
 				else if (request_method == GET_ALL_UPDATES) {
@@ -119,27 +122,24 @@ int main(int argc, char *argv[]) {
 				
 					int read_buf[LONG_RESPONSE_MSG_SIZE];
 					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] GET_ALL_UPDATES: %d ", i, 1);
-					for(j = 0; j < 20; j++){
-						printf("%d", read_buf[i]);
-					}
-					printf("\n");
+					printf("[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);	
 				} 
 				//GET_WSTAT
 				else if (request_method == GET_WSTAT) {		
-					printf("[%d] GET_WSTAT: %d <20 numbers>\n", i+1, 1);
 					request_structure[0] = 4;
 					write(sockfd, request_structure, sizeof(request_structure));
 					
 					int read_buf[LONG_RESPONSE_MSG_SIZE];
 					read(sockfd, read_buf, sizeof(read_buf));
-					for(j = 0; j < 20; j++){
-						printf("word length: %d, counts: %d\n", j+1, read_buf[j]);
+					printf("[%d] GET_WSTAT: %d ", client_ID, read_buf[1]);
+					for (j = 0; j < 20; j++){
+						printf("%d ", read_buf[j+2]);
 					}
+					printf("\n");
 				}
 				
 				close(sockfd); 
-				printf("[%d] close connection (successful execution)\n", i+1);
+				printf("[%d] close connection (successful execution)\n", client_ID);
 				
 				
 			} else {
