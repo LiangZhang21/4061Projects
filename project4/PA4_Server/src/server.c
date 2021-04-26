@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
         // Accept the data packet from client
         struct sockaddr_in clientAddress;
-		pthread_t new_thread[MAX_CONNECTIONS];
+		pthread_t new_thread;
 		socklen_t size = sizeof(struct sockaddr_in);
 		
 		if ( (thread_arg.clientfd = accept(sock, (struct sockaddr*) &clientAddress, &size)) < 0 ) {
@@ -187,17 +187,11 @@ int main(int argc, char *argv[]) {
 		//printf("%s\n", clientIpAddr);
 		printf("open connection from %s:%d\n", thread_arg.client_ip, thread_arg.client_port);
 		
-		if ( pthread_create(&new_thread[thread_arg.thread_count++], NULL, socket_thread, &thread_arg) != 0 ) {
+		if ( pthread_create(&new_thread, NULL, socket_thread, &thread_arg) != 0 ) {
 			fprintf(stderr, "Failed to create socket thread.\n");
 		}
 		
-		if (thread_arg.thread_count >= MAX_CONNECTIONS) {
-			int i;
-			for (i = 0; i < 50; i++) {
-				pthread_join(new_thread[i], NULL);
-			}
-			thread_arg.thread_count = 0;
-		}
+		pthread_detach(new_thread);
 		
     }
     exit(EXIT_SUCCESS);

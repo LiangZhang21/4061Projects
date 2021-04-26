@@ -79,78 +79,97 @@ int main(int argc, char *argv[]) {
     // spawn client processes
     pid_t client;
     
-    int request_method = 3;
-    
 	for (i = 0; i < clients_num; i++){
 		if ( (client = fork()) == 0 ) {
+			int request_structure[23];
+			int client_ID = i+1;
+			int j;
+			//Client ID
+			request_structure[1] = i+1;
+			//Socket for UPDATE_WSTAT
 			int sockfd = socket(AF_INET , SOCK_STREAM , 0);
 			if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) == 0) {
-				printf("[%d] open connection\n", i+1);	
-				int request_structure[23];
-				//Client ID
-				request_structure[1] = i+1;
-				//UPDATE_WSTAT
-				int j;
-				int client_ID = i+1;
-				if (request_method == UPDATE_WSTAT) {
-					//Get the words length stats		
-					getWordsStats(folder_name, client_ID);
-					if (is_empty_array == 0) {
-						request_structure[0] = 1;
-						request_structure[1] = client_ID;
-						for (j = 2; j < 23; j++) {
-							request_structure[j] = wordsLength[j-2];
-						}
-						write(sockfd, request_structure, sizeof(request_structure));
+				printf("[%d] open connection\n", client_ID);		
+				//Get the words length stats		
+				getWordsStats(folder_name, client_ID);
+				if (is_empty_array == 0) {
+					request_structure[0] = 1;
+					request_structure[1] = client_ID;
+					for (j = 2; j < 23; j++) {
+						request_structure[j] = wordsLength[j-2];
 					}
-					int read_buf[LONG_RESPONSE_MSG_SIZE];
-					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
-				} 
-				//GET_MY_UPDATES
-				else if (request_method == GET_MY_UPDATES) {
-					request_structure[0] = 2;
-					request_structure[1] = client_ID;
 					write(sockfd, request_structure, sizeof(request_structure));
-				
-					int read_buf[LONG_RESPONSE_MSG_SIZE];
-					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
-				} 
-				//GET_ALL_UPDATES
-				else if (request_method == GET_ALL_UPDATES) {
-					request_structure[0] = 3;
-					request_structure[1] = client_ID;
-					write(sockfd, request_structure, sizeof(request_structure));
-				
-					int read_buf[LONG_RESPONSE_MSG_SIZE];
-					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);	
-				} 
-				//GET_WSTAT
-				else if (request_method == GET_WSTAT) {		
-					request_structure[0] = 4;
-					request_structure[1] = client_ID;
-					write(sockfd, request_structure, sizeof(request_structure));
-					
-					int read_buf[LONG_RESPONSE_MSG_SIZE];
-					read(sockfd, read_buf, sizeof(read_buf));
-					printf("[%d] GET_WSTAT: %d ", client_ID, read_buf[1]);
-					for (j = 0; j < 20; j++){
-						printf("%d ", read_buf[j+2]);
-					}
-					printf("\n");
 				}
+				int read_buf[LONG_RESPONSE_MSG_SIZE];
+				read(sockfd, read_buf, sizeof(read_buf));
+				printf("[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
 				
 				close(sockfd); 
 				printf("[%d] close connection (successful execution)\n", client_ID);
-				
-				
+					
 			} else {
-
-				perror("Connection failed!");
-			}	
+				perror("Sockfd1 connection failed!");
+			}
 			
+			//Socket for GET_MY_UPDATES
+			int sockfd2 = socket(AF_INET , SOCK_STREAM , 0);
+			if (connect(sockfd2, (struct sockaddr *) &address, sizeof(address)) == 0) {
+				printf("[%d] open connection\n", client_ID);	
+				//request structure set up
+				request_structure[0] = 2;
+				request_structure[1] = client_ID;
+				write(sockfd, request_structure, sizeof(request_structure));
+				//Read back message from socket
+				int read_buf[LONG_RESPONSE_MSG_SIZE];
+				read(sockfd, read_buf, sizeof(read_buf));
+				printf("[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
+				close(sockfd2); 
+				printf("[%d] close connection (successful execution)\n", client_ID);
+			} else {
+				perror("Sockfd2 connection failed!");
+			}
+			
+			//Socket for GET_ALL_UPDATES
+			int sockfd3 = socket(AF_INET , SOCK_STREAM , 0);
+			if (connect(sockfd3, (struct sockaddr *) &address, sizeof(address)) == 0) {
+				printf("[%d] open connection\n", client_ID);
+				//request structure set up
+				request_structure[0] = 3;
+				request_structure[1] = client_ID;
+				write(sockfd, request_structure, sizeof(request_structure));
+				//Read back message from socket
+				int read_buf[LONG_RESPONSE_MSG_SIZE];
+				read(sockfd, read_buf, sizeof(read_buf));
+				printf("[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);					
+				
+				close(sockfd3); 
+				printf("[%d] close connection (successful execution)\n", client_ID);
+			} else {
+				perror("Sockfd3 connection failed!");
+			}
+			
+			//Socket for GET_WSTAT
+			int sockfd4 = socket(AF_INET , SOCK_STREAM , 0);
+			if (connect(sockfd4, (struct sockaddr *) &address, sizeof(address)) == 0) {
+				printf("[%d] open connection\n", client_ID);	
+				//request structure set up
+				request_structure[0] = 4;
+				request_structure[1] = client_ID;
+				write(sockfd, request_structure, sizeof(request_structure));
+				//Read back message from socket
+				int read_buf[LONG_RESPONSE_MSG_SIZE];
+				read(sockfd, read_buf, sizeof(read_buf));
+				printf("[%d] GET_WSTAT: %d ", client_ID, read_buf[1]);
+				for (j = 0; j < 20; j++){
+					printf("%d ", read_buf[j+2]);
+				}
+				printf("\n");
+				close(sockfd4); 
+				printf("[%d] close connection (successful execution)\n", client_ID);
+			} else {
+				perror("Sockfd4 connection failed!");
+			}
+										
 			break;		
 		} 
 	}
