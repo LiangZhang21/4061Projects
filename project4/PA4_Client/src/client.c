@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // spawn client processes
     pid_t client;
     
-    int request_method = 2;
+    int request_method = 3;
     
 	for (i = 0; i < clients_num; i++){
 		if ( (client = fork()) == 0 ) {
@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 					getWordsStats(folder_name, client_ID);
 					if (is_empty_array == 0) {
 						request_structure[0] = 1;
+						request_structure[1] = client_ID;
 						for (j = 2; j < 23; j++) {
 							request_structure[j] = wordsLength[j-2];
 						}
@@ -109,6 +110,7 @@ int main(int argc, char *argv[]) {
 				//GET_MY_UPDATES
 				else if (request_method == GET_MY_UPDATES) {
 					request_structure[0] = 2;
+					request_structure[1] = client_ID;
 					write(sockfd, request_structure, sizeof(request_structure));
 				
 					int read_buf[LONG_RESPONSE_MSG_SIZE];
@@ -118,6 +120,7 @@ int main(int argc, char *argv[]) {
 				//GET_ALL_UPDATES
 				else if (request_method == GET_ALL_UPDATES) {
 					request_structure[0] = 3;
+					request_structure[1] = client_ID;
 					write(sockfd, request_structure, sizeof(request_structure));
 				
 					int read_buf[LONG_RESPONSE_MSG_SIZE];
@@ -127,6 +130,7 @@ int main(int argc, char *argv[]) {
 				//GET_WSTAT
 				else if (request_method == GET_WSTAT) {		
 					request_structure[0] = 4;
+					request_structure[1] = client_ID;
 					write(sockfd, request_structure, sizeof(request_structure));
 					
 					int read_buf[LONG_RESPONSE_MSG_SIZE];

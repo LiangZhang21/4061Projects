@@ -57,7 +57,6 @@ int request_count_sum(){
 void * socket_thread(void *arg) {
 	struct thread_args *new_arg = (struct thread_args*)arg;
 	int new_socket = new_arg -> clientfd;
-	int client_ID = new_arg -> thread_count;
 	char* client_ip = new_arg -> client_ip;
 	int client_port = new_arg -> client_port;
 	int recv_buf[REQUEST_MSG_SIZE];
@@ -65,6 +64,7 @@ void * socket_thread(void *arg) {
 	if (read(new_socket, recv_buf, sizeof(recv_buf)) > 0) {
 		//printf("recv_buf: %d\n", recv_buf[1]);
 		size_t recv_buf_length = sizeof(recv_buf)/sizeof(recv_buf[0]);
+		int client_ID = recv_buf[1];
 		if (recv_buf_length == 23 || client_ID < 0) {
 			if (recv_buf[0] == UPDATE_WSTAT ) {
 				printf("[%d] UPDATE_WSTAT\n", client_ID);
@@ -90,12 +90,6 @@ void * socket_thread(void *arg) {
 					pthread_exit((int *) 1);
 				}
 				int count = request_count[client_ID-1];
-				int s;
-				for (s = 0; s < 20; s++) {
-					printf("%d \n", request_count[s]);
-				}
-				printf("ID: %d\n", client_ID);
-				printf("count: %d\n", count);
 				int get_my_updates[3] = {GET_MY_UPDATES, RSP_OK, count};
 				write(new_socket, get_my_updates, sizeof(get_my_updates)); 
 				if (pthread_mutex_unlock(&mutex)) {
@@ -104,7 +98,15 @@ void * socket_thread(void *arg) {
 				}
 			} else if (recv_buf[0] == GET_ALL_UPDATES) {
 				printf("[%d] GET_ALL_UPDATES\n", client_ID);
+				int s;
+				for (s = 0; s < 20; s++) {
+					printf("%d \n", request_count[s]);
+				}
 				int count_sum = request_count_sum(); 
+				
+				printf("ID: %d\n", client_ID);
+				printf("sum: %d\n", count_sum);
+				
 				int get_all_data[3] = {GET_ALL_UPDATES, RSP_OK, count_sum};
 				write(new_socket, get_all_data, sizeof(get_all_data));
 			} else if (recv_buf[0] == GET_WSTAT) {
