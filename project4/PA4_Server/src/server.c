@@ -21,8 +21,8 @@ int words_length[20];
 int request_count[20];
 int empty_data[20];
 
+//Creating a struct for thread arguments
 struct thread_args {
-		int thread_count;
 		int clientfd;
 		int client_port;	
 		char* client_ip;
@@ -167,10 +167,6 @@ int main(int argc, char *argv[]) {
     // Now server is ready to listen
     listen(sock, MAX_CONNECTIONS);
 	printf("server is listening\n");
-	
-	// Creating a struct for thread args
-	
-	thread_arg.thread_count = 0;
 	
     while (1) {
 
