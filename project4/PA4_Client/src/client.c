@@ -96,9 +96,7 @@ int main(int argc, char *argv[]) {
 			//Socket for UPDATE_WSTAT
 			int sockfd = socket(AF_INET , SOCK_STREAM , 0);
 			if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) == 0) {
-				//printf("[%d] open connection\n", client_ID);
 				fprintf(logfp, "[%d] open connection\n", client_ID);
-				//writeLineToFile(log_path, print_buf);
 				//Get the words length stats		
 				getWordsStats(folder_name, client_ID);
 				if (is_empty_array == 0) {
@@ -111,11 +109,8 @@ int main(int argc, char *argv[]) {
 				}
 				int read_buf[LONG_RESPONSE_MSG_SIZE];
 				read(sockfd, read_buf, sizeof(read_buf));
-				//printf("[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
-				fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
-				
+				fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);			
 				close(sockfd); 
-				//printf("[%d] close connection (successful execution)\n", client_ID);
 				fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 					
 			} else {
@@ -124,8 +119,7 @@ int main(int argc, char *argv[]) {
 			
 			//Socket for GET_MY_UPDATES
 			int sockfd2 = socket(AF_INET , SOCK_STREAM , 0);
-			if (connect(sockfd2, (struct sockaddr *) &address, sizeof(address)) == 0) {
-				//printf("[%d] open connection\n", client_ID);	
+			if (connect(sockfd2, (struct sockaddr *) &address, sizeof(address)) == 0) {	
 				fprintf(logfp, "[%d] open connection\n", client_ID);
 				//request structure set up
 				request_structure[0] = 2;
@@ -134,10 +128,8 @@ int main(int argc, char *argv[]) {
 				//Read back message from socket
 				int read_buf[LONG_RESPONSE_MSG_SIZE];
 				read(sockfd, read_buf, sizeof(read_buf));
-				//printf("[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
 				fprintf(logfp, "[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
 				close(sockfd2); 
-				//printf("[%d] close connection (successful execution)\n", client_ID);
 				fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 			} else {
 				perror("Sockfd2 connection failed!");
@@ -146,7 +138,6 @@ int main(int argc, char *argv[]) {
 			//Socket for GET_ALL_UPDATES
 			int sockfd3 = socket(AF_INET , SOCK_STREAM , 0);
 			if (connect(sockfd3, (struct sockaddr *) &address, sizeof(address)) == 0) {
-				//printf("[%d] open connection\n", client_ID);
 				fprintf(logfp, "[%d] open connection\n", client_ID);
 				//request structure set up
 				request_structure[0] = 3;
@@ -154,11 +145,9 @@ int main(int argc, char *argv[]) {
 				write(sockfd, request_structure, sizeof(request_structure));
 				//Read back message from socket
 				int read_buf[LONG_RESPONSE_MSG_SIZE];
-				read(sockfd, read_buf, sizeof(read_buf));
-				//printf("[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);					
+				read(sockfd, read_buf, sizeof(read_buf));			
 				fprintf(logfp, "[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf[1], read_buf[2]);
 				close(sockfd3); 
-				//printf("[%d] close connection (successful execution)\n", client_ID);
 				fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 			} else {
 				perror("Sockfd3 connection failed!");
@@ -167,7 +156,6 @@ int main(int argc, char *argv[]) {
 			//Socket for GET_WSTAT
 			int sockfd4 = socket(AF_INET , SOCK_STREAM , 0);
 			if (connect(sockfd4, (struct sockaddr *) &address, sizeof(address)) == 0) {
-				//printf("[%d] open connection\n", client_ID);
 				fprintf(logfp, "[%d] open connection\n", client_ID);
 				//request structure set up
 				request_structure[0] = 4;
@@ -176,16 +164,12 @@ int main(int argc, char *argv[]) {
 				//Read back message from socket
 				int read_buf[LONG_RESPONSE_MSG_SIZE];
 				read(sockfd, read_buf, sizeof(read_buf));
-				//printf("[%d] GET_WSTAT: %d", client_ID, read_buf[1]);
 				fprintf(logfp, "[%d] GET_WSTAT: %d", client_ID, read_buf[1]);
 				for (j = 0; j < 20; j++){
-					//printf(" %d", read_buf[j+2]);
 					fprintf(logfp, " %d", read_buf[j+2]);
 				}
-				//printf("\n");
 				fprintf(logfp, "\n");
 				close(sockfd4); 
-				//printf("[%d] close connection (successful execution)\n", client_ID);
 				fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 			} else {
 				perror("Sockfd4 connection failed!");
