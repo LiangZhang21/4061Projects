@@ -28,7 +28,6 @@ struct thread_args {
 		char* client_ip;
 };
 
-struct thread_args thread_arg;
 
 void update_wstat(int* request_structure) {
 	int i;
@@ -174,16 +173,17 @@ int main(int argc, char *argv[]) {
         struct sockaddr_in clientAddress;
 		pthread_t new_thread;
 		socklen_t size = sizeof(struct sockaddr_in);
-		
-		if ( (thread_arg.clientfd = accept(sock, (struct sockaddr*) &clientAddress, &size)) < 0 ) {
+		struct thread_args *thread_arg;
+		thread_arg = malloc (sizeof(struct thread_args));
+		if ( (thread_arg->clientfd = accept(sock, (struct sockaddr*) &clientAddress, &size)) < 0 ) {
 			fprintf(stderr, "Failed to accpet socket.\n");
 		}
-		thread_arg.client_ip = inet_ntoa(clientAddress.sin_addr);
-		thread_arg.client_port = clientAddress.sin_port;
+		thread_arg->client_ip = inet_ntoa(clientAddress.sin_addr);
+		thread_arg->client_port = clientAddress.sin_port;
 		//printf("%s\n", clientIpAddr);
-		printf("open connection from %s:%d\n", thread_arg.client_ip, thread_arg.client_port);
+		printf("open connection from %s:%d\n", thread_arg->client_ip, thread_arg->client_port);
 		
-		if ( pthread_create(&new_thread, NULL, socket_thread, &thread_arg) != 0 ) {
+		if ( pthread_create(&new_thread, NULL, socket_thread, thread_arg) != 0 ) {
 			fprintf(stderr, "Failed to create socket thread.\n");
 		}
 		
