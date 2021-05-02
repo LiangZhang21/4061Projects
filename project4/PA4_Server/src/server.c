@@ -66,9 +66,7 @@ void *socket_thread(void *arg) {
 		    size_t recv_buf_length = sizeof(recv_buf) / sizeof(recv_buf[0]);
 		    int client_ID = recv_buf[1];
 
-		    if (recv_buf_length == 23 || client_ID < 0) {
-		    	//break if recevie flag 0
-		    	if (recv_buf[23] == 0) break;
+		    if (recv_buf_length == 23 && (client_ID > 0 && client_ID < 21)) {
 		        if (recv_buf[0] == UPDATE_WSTAT) {
 		            printf("[%d] UPDATE_WSTAT\n", client_ID);
 		            if (pthread_mutex_lock(&mutex)) {
@@ -86,7 +84,6 @@ void *socket_thread(void *arg) {
 		            update_log[1] = RSP_OK;
 		            update_log[2] = client_ID;
 		            write(new_socket, update_log, sizeof(update_log));
-		            printf("hi\n");
 		        } else if (recv_buf[0] == GET_MY_UPDATES) {
 		            printf("[%d] GET_MY_UPDATES\n", client_ID);
 		            if (pthread_mutex_lock(&mutex)) {
@@ -117,6 +114,7 @@ void *socket_thread(void *arg) {
 		            }
 		            for (z = 0; z < 20; z++) {
 		                get_wstat_reponse[z + 2] = words_length[z];
+		                //printf("words_length: %d\n", words_length[z]);
 		            }
 		            if (pthread_mutex_unlock(&mutex)) {
 		                fprintf(stderr, "failed to unlock GET_MY_UPDATES");
@@ -131,6 +129,8 @@ void *socket_thread(void *arg) {
 		        printf("Invalid request\n");
 		        write(new_socket, empty_data, sizeof(empty_data));
 		    }
+		    //break if recevie flag 0
+		    if (recv_buf[22] == 0) break;
 		}
     }
     printf("close connection from %s:%d\n", client_ip, client_port);
