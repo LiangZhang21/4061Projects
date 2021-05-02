@@ -15,20 +15,20 @@
 
 #define NUM_ARGS 2
 #define MAX_CONNECTIONS 20
-//setting up mutex lock
+// setting up mutex lock
 pthread_mutex_t mutex;
 //Arrays for stats
 int words_length[20];
 int request_count[20];
 int empty_data[20];
 
-//Creating a struct for thread arguments
+// Creating a struct for thread arguments
 struct thread_args {
     int clientfd;
     int client_port;
     char *client_ip;
 };
-
+// To update the array
 void update_wstat(int *request_structure) {
     int i;
     for (i = 0; i < 20; i++) {
@@ -36,7 +36,7 @@ void update_wstat(int *request_structure) {
         //printf("index:%d, value:%d\n", i, words_length[i]);
     }
 }
-
+// To get the total count of request
 int request_count_sum() {
     int i, sum = 0;
     if (pthread_mutex_lock(&mutex)) {
@@ -52,8 +52,9 @@ int request_count_sum() {
     }
     return sum;
 }
-
+// To deal with request
 void *socket_thread(void *arg) {
+	// Setting up the struct args
     struct thread_args *new_arg = (struct thread_args *)arg;
     int new_socket = new_arg->clientfd;
     char *client_ip = new_arg->client_ip;
@@ -61,65 +62,83 @@ void *socket_thread(void *arg) {
     int recv_buf[REQUEST_MSG_SIZE];
     int read_size;
 	while (1) {
+		// Reading in the data from socket
 		if ( (read_size = read(new_socket, recv_buf, sizeof(recv_buf))) > 0) {
-		    //printf("recv_buf: %d\n", recv_buf[1]);
+		    // Setting up variables
 		    size_t recv_buf_length = sizeof(recv_buf) / sizeof(recv_buf[0]);
 		    int client_ID = recv_buf[1];
-
+			// Validating the data
 		    if (recv_buf_length == 23 && (client_ID > 0 && client_ID < 21)) {
+		    	//===============UPDATE_WSTAT================
 		        if (recv_buf[0] == UPDATE_WSTAT) {
 		            printf("[%d] UPDATE_WSTAT\n", client_ID);
+		            //locking up the critical section
 		            if (pthread_mutex_lock(&mutex)) {
 		                fprintf(stderr, "failed to lock update_wstat");
 		                pthread_exit((int *)1);
 		            }
 		            update_wstat(recv_buf);
 		            request_count[client_ID - 1]++;
+		            //unlocking the critical section
 		            if (pthread_mutex_unlock(&mutex)) {
 		                fprintf(stderr, "failed to unlock update_wstat");
 		                pthread_exit((int *)1);
 		            }
+		            //Setting up the response 
 		            int update_log[3];
 		            update_log[0] = UPDATE_WSTAT;
 		            update_log[1] = RSP_OK;
 		            update_log[2] = client_ID;
+		            //Sending back the response
 		            write(new_socket, update_log, sizeof(update_log));
 		        } else if (recv_buf[0] == GET_MY_UPDATES) {
+		        	//============GET_MY_UPDATES==============
 		            printf("[%d] GET_MY_UPDATES\n", client_ID);
+		            //locking up the critical section
 		            if (pthread_mutex_lock(&mutex)) {
 		                fprintf(stderr, "failed to lock GET_MY_UPDATES");
 		                pthread_exit((int *)1);
 		            }
+		            //setting up the response 
 		            int count = request_count[client_ID - 1];
 		            int get_my_updates[3] = {GET_MY_UPDATES, RSP_OK, count};
+		            //Sending the response back to client
 		            write(new_socket, get_my_updates, sizeof(get_my_updates));
+		            //unlocking the critical section
 		            if (pthread_mutex_unlock(&mutex)) {
 		                fprintf(stderr, "failed to unlock GET_MY_UPDATES");
 		                pthread_exit((int *)1);
 		            }
 		        } else if (recv_buf[0] == GET_ALL_UPDATES) {
+		        	//==============GET_ALL_UPDATES=============
 		            printf("[%d] GET_ALL_UPDATES\n", client_ID);
 		            int count_sum = request_count_sum();
+		            //Setting up the reponse message and send it back to client
 		            int get_all_data[3] = {GET_ALL_UPDATES, RSP_OK, count_sum};
 		            write(new_socket, get_all_data, sizeof(get_all_data));
 		        } else if (recv_buf[0] == GET_WSTAT) {
+		        	//==============GET_WSTAT====================
 		            printf("[%d] GET_WSTAT\n", client_ID);
+		            //Setting up the response structure
 		            int get_wstat_reponse[22];
 		            get_wstat_reponse[0] = GET_WSTAT;
 		            get_wstat_reponse[1] = RSP_OK;
 		            int z;
+		            //Locking up the critical section
 		            if (pthread_mutex_lock(&mutex)) {
 		               fprintf(stderr, "failed to lock GET_MY_UPDATES");
 		               pthread_exit((int *)1);
 		            }
+		            //Extracting the data to response message
 		            for (z = 0; z < 20; z++) {
 		                get_wstat_reponse[z + 2] = words_length[z];
-		                //printf("words_length: %d\n", words_length[z]);
 		            }
+		            //Unlocking the critical section
 		            if (pthread_mutex_unlock(&mutex)) {
 		                fprintf(stderr, "failed to unlock GET_MY_UPDATES");
 		                pthread_exit((int *)1);
 		            }
+		            //Sending the message back to client
 		            write(new_socket, get_wstat_reponse, sizeof(get_wstat_reponse));
 		        } else {
 		            printf("Invalid request\n");

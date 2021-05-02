@@ -15,12 +15,12 @@
 
 #define NUM_ARGS 5
 
-//Array to store words length
+// Array to store words length
 int wordsLength[20];
 bool is_empty_array = 1;
 
 FILE *logfp;
-
+// Codes provided from pervious assignment
 ssize_t getLineFromFile(FILE *fp, char *line, size_t len) {
     memset(line, '\0', len);
     return getline(&line, &len, fp);
@@ -35,7 +35,7 @@ void createLogFile(void) {
     mkdir("log", 0777);
     logfp = fopen("log/log_client.txt", "w");
 }
-
+// To update the words length array
 int getWordsStats(char *path) {
     FILE *fp = fopen(path, "r");
     if (fp == NULL) return 1;
@@ -59,15 +59,20 @@ int main(int argc, char *argv[]) {
         printf("Wrong number of args, expected %d", NUM_ARGS);
         exit(1);
     }
+    // initialized variables
     int i;
+    // To store the path
     char folder_name[200];
     strcpy(folder_name, argv[1]);
+    // To store the amount of clients
     int clients_num = atoi(argv[2]);
+    // To store the IP address
     char server_IP[200];
     strcpy(server_IP, argv[3]);
+    // To store the port number
     short server_port = atoi(argv[4]);
 
-
+	// Setting up socket address
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_port = htons(server_port);
@@ -81,27 +86,31 @@ int main(int argc, char *argv[]) {
 
     for (i = 0; i < clients_num; i++) {
         if ((client = fork()) == 0) {
+        	// Setting up a request structure
             int request_structure[23];
             int client_ID = i + 1;
             int j;
 
-            //Client ID
+            // Client ID
             request_structure[1] = i + 1;
-            //Socket for UPDATE_WSTAT
+            //==============UPDATE_WSTAT============
             int sockfd = socket(AF_INET, SOCK_STREAM, 0);
             if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) == 0) {
                 fprintf(logfp, "[%d] open connection\n", client_ID);
-                //Get the words length stats
+                // Get the words length stats
                 int temp = client_ID;
                 char fileName[500];
     			sprintf(fileName, "%s/%d.txt", folder_name, client_ID);
                 int count_update = 0;
+                // Continues to open files and make request until the end of streams
                 while (getWordsStats(fileName) == 0) {
                 	temp += clients_num;
                 	sprintf(fileName, "%s/%d.txt", folder_name, temp);
                 	//printf("filename: %s\n", fileName);
                 	int read_buf[LONG_RESPONSE_MSG_SIZE];
+                	// Skip if empty file
        	  		    if (is_empty_array == 0) {
+       	  		    	// Setting up the request structure
                     	request_structure[0] = 1;
                     	request_structure[1] = client_ID;
                     	for (j = 2; j < 23; j++) {
@@ -110,6 +119,7 @@ int main(int argc, char *argv[]) {
                     	request_structure[22] = 1;      	
                     	write(sockfd, request_structure, sizeof(request_structure));       
                	 		read(sockfd, read_buf, sizeof(read_buf));           	 	   
+               	 		// Reset the words counts after each request
                 		for (j = 0; j < 20; j++) {
                 			wordsLength[j] = 0;
                 		}
@@ -118,9 +128,7 @@ int main(int argc, char *argv[]) {
                 }
                 fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, count_update);
                	
-               	printf("socket2\n");
-				//socket 2
-				
+				//==========GET_MY_UPDATES=============
 				fprintf(logfp, "[%d] open connection\n", client_ID);
                 //request structure set up
                 request_structure[0] = 2;
@@ -132,8 +140,8 @@ int main(int argc, char *argv[]) {
                 fprintf(logfp, "[%d] GET_MY_UPDATES: %d %d\n", client_ID, read_buf2[1], read_buf2[2]);
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 				
-				printf("socket3\n");
-				//socket 3
+
+				//==========GET_ALL_UPDATES===========
 				fprintf(logfp, "[%d] open connection\n", client_ID);
                 //request structure set up
                 request_structure[0] = 3;
@@ -142,12 +150,10 @@ int main(int argc, char *argv[]) {
                 //Read back message from socket
                 int read_buf3[LONG_RESPONSE_MSG_SIZE];
                 read(sockfd, read_buf3, sizeof(read_buf3));
-
                 fprintf(logfp, "[%d] GET_ALL_UPDATES: %d %d\n", client_ID, read_buf3[1], read_buf3[2]);
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
                 
-                printf("socket4\n");
-                //socket 4
+                //===========GET_WSTAT================
                 fprintf(logfp, "[%d] open connection\n", client_ID);
                 //request structure set up
                 request_structure[0] = 4;
@@ -157,7 +163,6 @@ int main(int argc, char *argv[]) {
                 //Read back message from socket
                 int read_buf4[LONG_RESPONSE_MSG_SIZE];
                 read(sockfd, read_buf4, sizeof(read_buf4));
-
                 fprintf(logfp, "[%d] GET_WSTAT: %d", client_ID, read_buf4[1]);
                 for (j = 0; j < 20; j++) {
                     fprintf(logfp, " %d", read_buf4[j + 2]);
@@ -165,36 +170,12 @@ int main(int argc, char *argv[]) {
                 fprintf(logfp, "\n");
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
                 
-                 close(sockfd);
+                close(sockfd);
                  
             } else {
-                perror("Sockfd1 connection failed!");
+                perror("Sockfd connection failed!");
             }
 
-            //Socket for GET_MY_UPDATES
-//            int sockfd2 = socket(AF_INET, SOCK_STREAM, 0);
-//            if (connect(sockfd2, (struct sockaddr *)&address, sizeof(address)) == 0) {
-//                
-//            } else {
-//                perror("Sockfd2 connection failed!");
-//            }
-//
-            //Socket for GET_ALL_UPDATES
-//            int sockfd3 = socket(AF_INET, SOCK_STREAM, 0);
-//            if (connect(sockfd3, (struct sockaddr *)&address, sizeof(address)) == 0) {
-//                
-//            } else {
-//                perror("Sockfd3 connection failed!");
-//            }
-
-            //Socket for GET_WSTAT
-//            int sockfd4 = socket(AF_INET, SOCK_STREAM, 0);
-//            if (connect(sockfd4, (struct sockaddr *)&address, sizeof(address)) == 0) {
-//                
-//            } else {
-//                perror("Sockfd4 connection failed!");
-//            }
-			
        break;
    }
 }
