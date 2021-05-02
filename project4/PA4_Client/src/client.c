@@ -36,10 +36,8 @@ void createLogFile(void) {
     logfp = fopen("log/log_client.txt", "w");
 }
 
-int getWordsStats(char *path, int clientID) {
-    char fileName[500];
-    sprintf(fileName, "%s/%d.txt", path, clientID);
-    FILE *fp = fopen(fileName, "r");
+int getWordsStats(char *path) {
+    FILE *fp = fopen(path, "r");
     if (fp == NULL) return 1;
     char readbuf[1000];
     while (getLineFromFile(fp, readbuf, sizeof(readbuf)) > 0) {
@@ -51,7 +49,7 @@ int getWordsStats(char *path, int clientID) {
         }
     }
     is_empty_array = 0;
-
+	fclose(fp);
     return 0;
 }
 
@@ -68,9 +66,7 @@ int main(int argc, char *argv[]) {
     char server_IP[200];
     strcpy(server_IP, argv[3]);
     short server_port = atoi(argv[4]);
-    char log_path[400];
-    strcpy(log_path, "log/log_client.txt");
-    logfp = fopen(log_path, "r");
+
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
@@ -96,21 +92,45 @@ int main(int argc, char *argv[]) {
             if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) == 0) {
                 fprintf(logfp, "[%d] open connection\n", client_ID);
                 //Get the words length stats
-                getWordsStats(folder_name, client_ID);
-                int read_buf[LONG_RESPONSE_MSG_SIZE];
+                int temp = client_ID;
+                char fileName[500];
+    			sprintf(fileName, "%s/%d.txt", folder_name, client_ID);
+                int count_update = 0;
+                while (getWordsStats(fileName) == 0) {
+                	temp += clients_num;
+                	sprintf(fileName, "%s/%d.txt", folder_name, temp);
+                	printf("filename: %s\n", fileName);
+                	int read_buf[LONG_RESPONSE_MSG_SIZE];
+       	  		    if (is_empty_array == 0) {
+                    	request_structure[0] = 1;
+                    	request_structure[1] = client_ID;
+                    	for (j = 2; j < 23; j++) {
+                        	request_structure[j] = wordsLength[j - 2];
+                    	}
+                    	request_structure[23] = 1;      	
+                    	write(sockfd, request_structure, sizeof(request_structure));    
+                    	printf("1\n");    
+               	 		read(sockfd, read_buf, sizeof(read_buf));           	 	
+						printf("2\n");    
+                		for (j = 0; j < 19; i++) {
+                			wordsLength[j] = 0;
+                		}
+                		count_update++;
+                	}    	
+                }
+                printf("yikes\n");
+                //sending a flag to close connection
+                request_structure[0] = 1;
+                request_structure[1] = client_ID;
+                request_structure[23] = 0;  
+                write(sockfd, request_structure, sizeof(request_structure)); 
+                	
                 if (is_empty_array == 0) {
-                    request_structure[0] = 1;
-                    request_structure[1] = client_ID;
-                    for (j = 2; j < 23; j++) {
-                        request_structure[j] = wordsLength[j - 2];
-                    }
-                    write(sockfd, request_structure, sizeof(request_structure));
-                    
-               	 	read(sockfd, read_buf, sizeof(read_buf));
-               	 	fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, 1);
+                	fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, count_update);
                 } else {
                 	fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, 0);
-                }    
+                }   
+      
                 close(sockfd);
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 
@@ -176,9 +196,9 @@ int main(int argc, char *argv[]) {
                 perror("Sockfd4 connection failed!");
             }
 
-            break;
-        }
-    }
+       break;
+   }
+}
 
     // wait for all client processes to terminate
     while (wait(NULL) > 0)
