@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
                 fprintf(logfp, "[%d] open connection\n", client_ID);
                 //Get the words length stats
                 getWordsStats(folder_name, client_ID);
+                int read_buf[LONG_RESPONSE_MSG_SIZE];
                 if (is_empty_array == 0) {
                     request_structure[0] = 1;
                     request_structure[1] = client_ID;
@@ -104,9 +105,9 @@ int main(int argc, char *argv[]) {
                         request_structure[j] = wordsLength[j - 2];
                     }
                     write(sockfd, request_structure, sizeof(request_structure));
-                }
-                int read_buf[LONG_RESPONSE_MSG_SIZE];
-                read(sockfd, read_buf, sizeof(read_buf));
+                    
+               	 	read(sockfd, read_buf, sizeof(read_buf));
+                }       
                 fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
                 close(sockfd);
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);

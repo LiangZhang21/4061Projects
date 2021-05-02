@@ -59,8 +59,9 @@ void *socket_thread(void *arg) {
     char *client_ip = new_arg->client_ip;
     int client_port = new_arg->client_port;
     int recv_buf[REQUEST_MSG_SIZE];
+    int read_size;
 
-    if (read(new_socket, recv_buf, sizeof(recv_buf)) > 0) {
+    if ( (read_size =read(new_socket, recv_buf, sizeof(recv_buf))) > 0) {
         //printf("recv_buf: %d\n", recv_buf[1]);
         size_t recv_buf_length = sizeof(recv_buf) / sizeof(recv_buf[0]);
         int client_ID = recv_buf[1];
@@ -114,7 +115,7 @@ void *socket_thread(void *arg) {
                 printf("Invalid request\n");
                 write(new_socket, empty_data, sizeof(empty_data));
             }
-        } else {
+        } else if (read_size < 0) {
             printf("Invalid request\n");
             write(new_socket, empty_data, sizeof(empty_data));
         }
