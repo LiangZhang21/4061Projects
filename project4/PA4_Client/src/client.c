@@ -107,8 +107,10 @@ int main(int argc, char *argv[]) {
                     write(sockfd, request_structure, sizeof(request_structure));
                     
                	 	read(sockfd, read_buf, sizeof(read_buf));
-                }       
-                fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, read_buf[2]);
+               	 	fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, 1);
+                } else {
+                	fprintf(logfp, "[%d] UPDATE_WSTAT: %d\n", client_ID, 0);
+                }    
                 close(sockfd);
                 fprintf(logfp, "[%d] close connection (successful execution)\n", client_ID);
 

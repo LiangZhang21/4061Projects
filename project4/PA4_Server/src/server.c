@@ -81,7 +81,7 @@ void *socket_thread(void *arg) {
                 int update_log[3];
                 update_log[0] = UPDATE_WSTAT;
                 update_log[1] = RSP_OK;
-                update_log[2] = 1;
+                update_log[2] = client_ID;
                 write(new_socket, update_log, sizeof(update_log));
             } else if (recv_buf[0] == GET_MY_UPDATES) {
                 printf("[%d] GET_MY_UPDATES\n", client_ID);
