@@ -1,0 +1,24 @@
+[1] open connection
+[1] UPDATE_WSTAT: 10
+[1] GET_MY_UPDATES: 1 10
+[1] GET_ALL_UPDATES: 1 38
+[1] GET_WSTAT: 1 1 1 23 68 159 312 427 515 567 471 420 308 180 150 78 59 29 18 5 6
+[1] close connection (successful execution)
+[3] open connection
+[3] UPDATE_WSTAT: 10
+[3] GET_MY_UPDATES: 1 10
+[3] GET_ALL_UPDATES: 1 38
+[3] GET_WSTAT: 1 1 1 23 68 159 312 427 515 567 471 420 308 180 150 78 59 29 18 5 6
+[3] close connection (successful execution)
+[2] open connection
+[2] UPDATE_WSTAT: 10
+[2] GET_MY_UPDATES: 1 10
+[2] GET_ALL_UPDATES: 1 40
+[2] GET_WSTAT: 1 1 2 26 70 167 328 447 544 595 493 444 318 198 159 82 62 30 19 6 6
+[2] close connection (successful execution)
+[4] open connection
+[4] UPDATE_WSTAT: 10
+[4] GET_MY_UPDATES: 1 10
+[4] GET_ALL_UPDATES: 1 40
+[4] GET_WSTAT: 1 1 2 26 70 167 328 447 544 595 493 444 318 198 159 82 62 30 19 6 6
+[4] close connection (successful execution)
